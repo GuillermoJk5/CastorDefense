@@ -16,10 +16,8 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
 
     UClass* ParentUClass = ParentClass.Get();
 
-    // Obtenemos el Asset Registry
     IAssetRegistry& AssetRegistry = FAssetRegistryModule::GetRegistry();
 
-    // Path de la clase padre
     FTopLevelAssetPath ParentClassPath = ParentUClass->GetClassPathName();
 
     TArray<FTopLevelAssetPath> ParentClasses;
@@ -28,7 +26,6 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
     TSet<FTopLevelAssetPath> ExcludedClasses;
     TSet<FTopLevelAssetPath> DerivedClassPaths;
 
-    // Obtiene TODOS los descendientes, incluidos nietos, bisnietos, etc.
     AssetRegistry.GetDerivedClassNames(
         ParentClasses,
         ExcludedClasses,
@@ -37,16 +34,6 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
 
     for (const FTopLevelAssetPath& DerivedClassPath : DerivedClassPaths)
     {
-        /*
-         * DerivedClassPath para un Blueprint será algo parecido a:
-         *
-         * /Game/Enemies/BP_Enemigo.BP_Enemigo_C
-         *
-         * El Blueprint asset que queremos cargar es:
-         *
-         * /Game/Enemies/BP_Enemigo.BP_Enemigo
-         */
-
         const FName PackageName = DerivedClassPath.GetPackageName();
         const FString AssetName = FPackageName::GetShortName(PackageName.ToString());
 
@@ -62,7 +49,6 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
             continue;
         }
 
-        // Cargamos el Blueprint asset
         UObject* AssetObject = AssetData.GetAsset();
 
         UBlueprint* Blueprint = Cast<UBlueprint>(AssetObject);
@@ -72,7 +58,6 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
             continue;
         }
 
-        // Esta es la clase que realmente necesitamos para Spawn Actor From Class
         UClass* GeneratedClass = Blueprint->GeneratedClass;
 
         if (!GeneratedClass)
@@ -93,7 +78,6 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
         Result.Add(GeneratedClass);
     }
 
-    // Si no existen descendientes, devolvemos el propio padre
     if (Result.Num() == 0)
     {
         Result.Add(ParentClass);
