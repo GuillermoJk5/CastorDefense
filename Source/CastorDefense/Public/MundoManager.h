@@ -7,11 +7,13 @@
 #include "MundoManager.generated.h"
 
 class UZonaManager;
+class AZona;
 
 UENUM(BlueprintType)
-enum class EtipoCasilla : uint8
+enum class ETipoCasilla : uint8
 {
 	  NaN  UMETA(DisplayName = "NaN")
+	, Terreno UMETA(DisplayName = "Terreno")
 	, Camino  UMETA(DisplayName = "Camino")
 	, CaminoConectado  UMETA(DisplayName = "CaminoConectado")
 	, Puente  UMETA(DisplayName = "Puente")
@@ -38,10 +40,10 @@ struct FestadoMundo
 	bool fin;
 
 	UPROPERTY()
-	TArray<FVector2D> posicionesPuentes;
+	TArray<FVector2D> PosicionesPuentes;
 
 	UPROPERTY()
-	TArray<EtipoCasilla> mapaAPintar;
+	TArray<ETipoCasilla> mapaAPintar;
 
 	UPROPERTY()
 	FVector2D posicionActual;
@@ -53,7 +55,7 @@ struct FestadoMundo
 	int cantidad;
 
 	UPROPERTY()
-	bool zonaTerminada;
+	bool ZonaTerminada;
 
 	UPROPERTY()
 	uint8 actually;
@@ -70,12 +72,12 @@ struct FestadoMundo
 		,zIndexAdyacentes()
 		,zBuscarMas(true)
 		,fin(false)
-		,posicionesPuentes()
+		,PosicionesPuentes()
 		//,mapaApintar()
 		,posicionActual(0.f , 0.f)
 		,movimientoDinamico()
 		,cantidad(0)
-		,zonaTerminada(true)
+		,ZonaTerminada(true)
 		,actually(0)
 		,tieneQueSerInterseccion(false)
 		,cantidadFinCiclos(0)
@@ -93,10 +95,10 @@ class CASTORDEFENSE_API UMundoManager : public UWorldSubsystem
 
 public:
 
-	/*
+	
 	UPROPERTY()
-	int mapaZonas;
-	*/
+	TArray<AZona*> mapaZonas;
+	
 
 	UPROPERTY()
 	UZonaManager* zonaManager;
@@ -105,13 +107,13 @@ public:
 	float tamanyoCasilla;
 
 	UPROPERTY()
-	int tamanyoLadoZona;
+	int TamanyoLadoZona;
 
 	UPROPERTY()
 	int tamanyoLadoMundo;
 
 	UPROPERTY()
-	struct FestadoMundo estados;
+	struct FestadoMundo Estados;
 
 	/*
 	UPROPERTY(EditAnywhere)
