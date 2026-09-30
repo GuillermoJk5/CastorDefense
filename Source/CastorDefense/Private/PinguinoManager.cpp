@@ -40,3 +40,8 @@ void UPinguinoManager::AsignarObjetos()
         UE_LOG(LogTemp, Log, TEXT("Cocina: Esperando a que PatataSubsystem sea inicializado..."));
     }
 }
+
+bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PosicionesPuentes, TArray <ETipoCasilla> MapaRecursivo) {
+
+    return true;
+}

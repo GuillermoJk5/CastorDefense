@@ -80,25 +80,25 @@ public:
 	void SetInterseccion(bool InInterseccion);
 
 	UFUNCTION(Category = "Getter")
-	FDatosCasillas GetDatosCasillas();
+	TArray<FDatosCasillas> GetDatosCasillas();
 
 	UFUNCTION(Category = "Setter")
-	void SetDatosCasillas(FDatosCasillas InInterseccion);
+	void SetDatosCasillas(TArray<FDatosCasillas> InInterseccion);
 
 	UFUNCTION(Category = "Getter")
-	FDatosCasillas GetDatosCasillasPuentes();
+	TArray<FDatosCasillas> GetDatosCasillasPuentes();
 
 	UFUNCTION(Category = "Setter")
-	void SetDatosCasillasPuentes(FDatosCasillas InInterseccion);
+	void SetDatosCasillasPuentes(TArray<FDatosCasillas> InInterseccion);
 private:
 
 	UPROPERTY(EditAnywhere)
-	bool Interseccion;
+	bool Interseccion = false;
 
 	UPROPERTY(EditAnywhere)
-	FDatosCasillas DatosCasillas;
+	TArray<FDatosCasillas> DatosCasillas;
 
 	UPROPERTY(EditAnywhere)
-	FDatosCasillas DatosCasillasPuentes;
+	TArray<FDatosCasillas> DatosCasillasPuentes;
 
 };

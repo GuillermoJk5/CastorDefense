@@ -23,71 +23,72 @@ enum class ETipoCasilla : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FestadoMundo
+struct FEstadoMundo
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<int> zIndexCreados;
+	TArray<int> ZIndexCreados;
 
 	UPROPERTY()
-	TArray<int> zIndexAdyacentes;
+	TArray<int> ZIndexAdyacentes;
 
 	UPROPERTY()
-	bool zBuscarMas;
+	bool ZBuscarMas;
 
 	UPROPERTY()
-	bool fin;
+	bool Fin;
 
 	UPROPERTY()
 	TArray<FVector2D> PosicionesPuentes;
 
 	UPROPERTY()
-	TArray<ETipoCasilla> mapaAPintar;
+	TArray<ETipoCasilla> MapaAPintar;
 
 	UPROPERTY()
-	FVector2D posicionActual;
+	FVector2D PosicionActual;
 
 	UPROPERTY()
-	TArray<FVector2D> movimientoDinamico;
+	TArray<FVector2D> MovimientoDinamico;
 
 	UPROPERTY()
-	int cantidad;
+	int Cantidad;
 
 	UPROPERTY()
 	bool ZonaTerminada;
 
 	UPROPERTY()
-	uint8 actually;
+	uint8 Actually;
 
 	UPROPERTY()
-	bool tieneQueSerInterseccion;
+	bool TieneQueSerInterseccion;
 
 	UPROPERTY()
-	int cantidadFinCiclos;
+	int CantidadFinCiclos;
 
 
-	FestadoMundo() 
-		:zIndexCreados()
-		,zIndexAdyacentes()
-		,zBuscarMas(true)
-		,fin(false)
+	FEstadoMundo() 
+		:ZIndexCreados()
+		,ZIndexAdyacentes()
+		,ZBuscarMas(true)
+		,Fin(false)
 		,PosicionesPuentes()
-		//,mapaApintar()
-		,posicionActual(0.f , 0.f)
-		,movimientoDinamico()
-		,cantidad(0)
+		,MapaAPintar()
+		,PosicionActual(0.f , 0.f)
+		,MovimientoDinamico()
+		,Cantidad(0)
 		,ZonaTerminada(true)
-		,actually(0)
-		,tieneQueSerInterseccion(false)
-		,cantidadFinCiclos(0)
+		,Actually(0)
+		,TieneQueSerInterseccion(false)
+		,CantidadFinCiclos(0)
 	{}
 
 };
+
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class CASTORDEFENSE_API UMundoManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
@@ -95,47 +96,123 @@ class CASTORDEFENSE_API UMundoManager : public UWorldSubsystem
 
 public:
 
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
+
+
+	//Getters y Setters
+	UFUNCTION()
+	UZonaManager* GetZonaManager();
+
+	UFUNCTION()
+	void SetZonaManager(UZonaManager* InZonaManager);
+
+	UFUNCTION()
+	TArray<AZona*> GetMapaZonas();
+
+	UFUNCTION()
+	void SetMapaZonas(TArray<AZona*> InMapaZonas);
+
+	UFUNCTION()
+	float GetTamanyoCasilla();
+
+	UFUNCTION()
+	void SetTamanyoCasilla(float InTamanyoCasilla);
+
+	UFUNCTION()
+	int GetTamanyoLadoZona();
+
+	UFUNCTION()
+	void SetTamanyoLadoZona(int InTamanyoLadoZona);
+
+	UFUNCTION()
+	float GetTamanyoLadoMundo();
+
+	UFUNCTION()
+	void SetTamanyoLadoMundo(int InTamanyoLadoMundo);
+
+	UFUNCTION()
+	struct FEstadoMundo GetEstados();
+
+	UFUNCTION()
+	void SetEstados(struct FEstadoMundo InEstados);
+
+	UFUNCTION()
+	void SetEstadosTieneQueSerInterseccion(bool InTieneQueSerInterseccion);
+
+	UFUNCTION()
+	void SetEstadosPosicionesPuentes(TArray<FVector2D> InPosicionesPuentes);
+
+	UFUNCTION()
+	void SetEstadosCantidadFinCiclos(int InCantidadFinCiclos);
+
+	UFUNCTION()
+	void SetEstadosMapaAPintar(TArray<ETipoCasilla> InMapaAPintar);
+
+	//Metodos
+
+	UFUNCTION()
+	void CrearNavMesh();
+
+	UFUNCTION()
+	AZona* GenerarEsquinaMundo(int index);
+
+	UFUNCTION()
+	void GenerarZonasDesdeInicio();
+
+	UFUNCTION()
+	void ComprobarZonasAdyacentes(FVector2D Coordenada, TArray<AZona*>& ZonasAdyacentes, TArray<int>& ZonasVacias);
+
+	UFUNCTION()
+	TArray<FVector2D> ObtenerPosiblesAdyacentes(FVector2D PosicionCentral, int TamanyoLadoMatriz);
+
+	UFUNCTION()
+	bool ComprobarLimitesDeMatriz(FVector2D Vector, int TamanyoLadoMatriz);
 	
-	UPROPERTY()
-	TArray<AZona*> mapaZonas;
-	
+	UFUNCTION()
+	TArray<FVector2D> ObtenerPosiblesDiagonalesAdyacentes(FVector2D PosicionCentral, int TamanyoLadoMatriz);
+
+	FORCEINLINE FVector2D ObtenerCoordenadasDeUnaZonaConIndex(int index) {
+
+		return FVector2D
+		(
+			(TamanyoCasilla * TamanyoLadoZona + TamanyoCasilla * 2) * (index % TamanyoLadoMundo)
+			,(TamanyoCasilla * TamanyoLadoZona + TamanyoCasilla * 2) * (index / TamanyoLadoMundo)
+		);
+
+	}
+
+private:
 
 	UPROPERTY()
-	UZonaManager* zonaManager;
+	TArray<AZona*> MapaZonas;
 
 	UPROPERTY()
-	float tamanyoCasilla;
+	UZonaManager* ZonaManager;
+
+	UPROPERTY()
+	float TamanyoCasilla;
 
 	UPROPERTY()
 	int TamanyoLadoZona;
 
 	UPROPERTY()
-	int tamanyoLadoMundo;
+	int TamanyoLadoMundo;
 
 	UPROPERTY()
-	struct FestadoMundo Estados;
+	struct FEstadoMundo Estados;
 
 	/*
 	UPROPERTY(EditAnywhere)
-	int meshCasilla
+	int MeshCasilla
 	
 	UPROPERTY()
-	int enemigosManager;
+	int EnemigosManager;
 
 	UPROPERTY()
-	int actorObjetivo;
+	int ActorObjetivo;
 
 	UPROPERTY()
-	int gestorOleadas;
+	int GestorOleadas;
 	*/
-
-
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-
-private:
-
-	void AsignarObjetos();
-
-	FTimerHandle TimerHandle_AssignSubsystem;
 
 };

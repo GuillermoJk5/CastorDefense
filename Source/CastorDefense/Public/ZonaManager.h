@@ -12,6 +12,8 @@
 
 class UPinguinoManager;
 class UMundoManager;
+class AZona;
+
 /**
  * Clase que se encarga de gestionar las zonas del mundo
  */
@@ -22,8 +24,6 @@ class CASTORDEFENSE_API UZonaManager : public UWorldSubsystem
 	
 public:	
 
-	//Eliminable
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
@@ -40,6 +40,7 @@ public:
 	void SetPinguinoManager(UPinguinoManager* InPinguinoManager);
 
 	//FALTA
+	UFUNCTION()
 	int InstanciarCasilla(/*¿StaticMesh?* HIX, */FVector2D PosicionCasilla);
 
 	//FALTA PUENTE
@@ -48,22 +49,21 @@ public:
 
 	//FALTA COMPROBARZONASADYACENTES
 	//FALTA PINGUINOBORRACHO
-	//UFUNCTION(BlueprintCallable, Category = "MiSistema")
-	//AActor* GenerarZona();
+	UFUNCTION()
+	AZona* GenerarZona(FVector2D CoordenadasZona);
 
 	UFUNCTION()
-	AActor* GenerarZonaInicial(FVector2D CoordenadasZona);
+	AZona* GenerarZonaInicial(FVector2D CoordenadasZona);
 
 	UFUNCTION()
-	AActor* GenerarZonaPortal(FVector2D CoordenadasZona);
+	AZona* GenerarZonaPortal(FVector2D CoordenadasZona);
 
 	//FALTA ZONA
 	//UFUNCTION()
 	//void HabilitarZonas(UZona* Zona);
 
-	//FALTA ZONA
-	//UFUNCTION()
-	//void CalcularPosicionPuenteZonaPrevia(UZona* Zona, FVector2D CoordenadasZonaNueva, FVector2D PosicionZonaPrevia);
+	UFUNCTION()
+	FVector2D CalcularPosicionPuenteZonaPrevia(AZona* Zona, FVector2D CoordenadasZonaNueva, FVector2D PosicionZonaPrevia);
 
 	UFUNCTION()
 	void ComprobarSiHayCasillasAdyacentes(FVector2D PosicionCasillas, TArray<ETipoCasilla> MapaSimple, FVector2D& PCA, TArray<ETipoCasilla>& CasillasExistentesSimplificado);
@@ -85,6 +85,9 @@ public:
 
 	UFUNCTION()
 	void AsociarPuentesConZonas(/*TArray<UZona> Zona*/);
+
+	UFUNCTION()
+	FVector2D VectorDeLadoZona();
 
 
 	FORCEINLINE bool ComprobacionesPuentesEnZonaInicial(int X, int Y, int TamanyoLadoZona) {
@@ -122,7 +125,7 @@ public:
 
 		}
 		if (NoEsTerreno) {
-			if (ComprobacionesPuentesEnZonaInicial(X, Y, MundoManager->TamanyoLadoZona - 1)) {
+			if (ComprobacionesPuentesEnZonaInicial(X, Y, MundoManager->GetTamanyoLadoZona() - 1)) {
 				return ETipoCasilla::Puente;
 			}
 			else if (X == 5 && Y == 5) {
@@ -135,7 +138,25 @@ public:
 		return ETipoCasilla::Terreno;
 	}
 
-//Eliminable
+	FORCEINLINE bool ComprobarSiHayInterseccion(FVector2D CoordenadasZona, int CantidadFinCilos) {
+	
+		FVector2D Vector = CoordenadasZona / VectorDeLadoZona();
+
+		if (MundoManager->GetTamanyoLadoMundo() - 1 == Vector.X 
+			&& Vector.X == 0
+			&& MundoManager->GetTamanyoLadoMundo() - 1 == Vector.Y
+			&& Vector.Y == 0) {
+		
+			return true;
+		}
+		else if(CantidadFinCilos != 1) {
+		
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Migracion");
@@ -144,9 +165,4 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Migracion");
 	UPinguinoManager* PinguinoManager;
 
-	//Eliminable
-	void AsignarObjetos();
-	
-	//Eliminable
-	FTimerHandle TimerHandle_AssignSubsystem;
 };

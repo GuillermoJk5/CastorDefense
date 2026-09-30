@@ -21,9 +21,14 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
+	UFUNCTION()
+	bool PinguinoBorracho(TArray<FVector2D> PosicionesPuentes, TArray<ETipoCasilla> MapaRecursivo);
+
 private:
- 
+	
     void AsignarObjetos();
+
+	
  
     FTimerHandle TimerHandle_AssignSubsystem;
 };

@@ -5,7 +5,11 @@
 
 // Sets default values
 AZona::AZona()
+	:Interseccion(false)
+	,DatosCasillas()
+	,DatosCasillasPuentes()
 {
+
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -35,22 +39,22 @@ void AZona::SetInterseccion(bool InInterseccion)
 	this->Interseccion = InInterseccion;
 }
 
-FDatosCasillas AZona::GetDatosCasillas()
+TArray<FDatosCasillas> AZona::GetDatosCasillas()
 {
 	return this->DatosCasillas;
 }
 
-void AZona::SetDatosCasillas(FDatosCasillas InDatosCasillas)
+void AZona::SetDatosCasillas(TArray<FDatosCasillas> InDatosCasillas)
 {
 	this->DatosCasillas = InDatosCasillas;
 }
 
-FDatosCasillas AZona::GetDatosCasillasPuentes()
+TArray<FDatosCasillas> AZona::GetDatosCasillasPuentes()
 {
 	return this->DatosCasillasPuentes;
 }
 
-void AZona::SetDatosCasillasPuentes(FDatosCasillas InDatosCasillas)
+void AZona::SetDatosCasillasPuentes(TArray<FDatosCasillas> InDatosCasillas)
 {
 	this->DatosCasillas = InDatosCasillas;
 }
