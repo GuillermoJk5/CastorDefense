@@ -4,23 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+
+//Enum TipoCasillas
+#include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
 #include "MundoManager.generated.h"
 
 class UZonaManager;
 class AZona;
-
-UENUM(BlueprintType)
-enum class ETipoCasilla : uint8
-{
-	  NaN  UMETA(DisplayName = "NaN")
-	, Terreno UMETA(DisplayName = "Terreno")
-	, Camino  UMETA(DisplayName = "Camino")
-	, CaminoConectado  UMETA(DisplayName = "CaminoConectado")
-	, Puente  UMETA(DisplayName = "Puente")
-	, PuenteConectado  UMETA(DisplayName = "PuenteConectado")
-	, Objetivo  UMETA(DisplayName = "Objetivo")
-	, SpawnEnemigo  UMETA(DisplayName = "SpawnEnemigo")
-};
 
 USTRUCT(BlueprintType)
 struct FEstadoMundo
@@ -137,16 +127,45 @@ public:
 	void SetEstados(struct FEstadoMundo InEstados);
 
 	UFUNCTION()
-	void SetEstadosTieneQueSerInterseccion(bool InTieneQueSerInterseccion);
+	UMundoManager* SetEstadosZIndexCreados(TArray<int> InZIndexCreados);
 
 	UFUNCTION()
-	void SetEstadosPosicionesPuentes(TArray<FVector2D> InPosicionesPuentes);
+	UMundoManager* SetEstadosZIndexAdyacentes(TArray<int> InZIndexAdyacentes);
 
 	UFUNCTION()
-	void SetEstadosCantidadFinCiclos(int InCantidadFinCiclos);
+	UMundoManager* SetEstadosZBuscarMas(bool InZBuscarMas);
 
 	UFUNCTION()
-	void SetEstadosMapaAPintar(TArray<ETipoCasilla> InMapaAPintar);
+	UMundoManager* SetEstadosFin(bool InFin);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosPosicionesPuentes(TArray<FVector2D> InPosicionesPuentes);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosMapaAPintar(TArray<ETipoCasilla> InMapaAPintar);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosPosicionActual(FVector2D InPosicionActual);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosMovimientoDinamico(TArray<FVector2D> InMovimientoDinamico);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosCantidad(int InCantidad);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosZonaTerminada(bool InZonaTerminada);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosActually(uint8 InActually);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosTieneQueSerInterseccion(bool InTieneQueSerInterseccion);
+
+	UFUNCTION()
+	UMundoManager* SetEstadosCantidadFinCiclos(int InCantidadFinCiclos);
+
+	
 
 	//Metodos
 

@@ -360,11 +360,14 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
     return CasillaPuenteZonaNueva;
 }
 
-void UZonaManager::ComprobarSiHayCasillasAdyacentes(FVector2D PosicionCasillas, TArray<ETipoCasilla> MapaSimple, FVector2D& PCA, TArray<ETipoCasilla>& CasillasExistentesSimplificado)
+void UZonaManager::ComprobarSiHayCasillasAdyacentes(FVector2D PosicionCasillas, TArray<ETipoCasilla> MapaSimple, TArray<FVector2D>& PCA, TArray<ETipoCasilla>& CasillasExistentesSimplificado)
 {
-    //TArray<FVector2D> PosicionesPosibles = MundoManager->ObtenerPosiblesAdyacentes(PosicionCasillas, MundoManager->GetTamanyoLadoZona());
-    PCA;
-    CasillasExistentesSimplificado;
+    for (FVector2D Posicion : MundoManager->ObtenerPosiblesAdyacentes(PosicionCasillas, MundoManager->GetTamanyoLadoZona())) {
+        if (MapaSimple[(Posicion.Y * MundoManager->GetTamanyoLadoZona()) + Posicion.X] == ETipoCasilla::NaN) {
+            CasillasExistentesSimplificado.Add(MapaSimple[(Posicion.Y * MundoManager->GetTamanyoLadoZona()) + Posicion.X]);
+            PCA.Add(Posicion);
+        }
+    }
 }
 
 int UZonaManager::ObtenerIndexConPosicionCasillasOZonas(FVector2D Posicion, int TamanyoLadoArray)
@@ -493,5 +496,3 @@ FVector2D UZonaManager::VectorDeLadoZona()
   return FVector2D(MundoManager->GetTamanyoCasilla()* MundoManager->GetTamanyoLadoZona() + (MundoManager->GetTamanyoCasilla() * 2)
       , MundoManager->GetTamanyoCasilla() * MundoManager->GetTamanyoLadoZona() + (MundoManager->GetTamanyoCasilla() * 2));
 }
-
-

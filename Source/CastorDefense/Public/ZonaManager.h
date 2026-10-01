@@ -66,7 +66,7 @@ public:
 	FVector2D CalcularPosicionPuenteZonaPrevia(AZona* Zona, FVector2D CoordenadasZonaNueva, FVector2D PosicionZonaPrevia);
 
 	UFUNCTION()
-	void ComprobarSiHayCasillasAdyacentes(FVector2D PosicionCasillas, TArray<ETipoCasilla> MapaSimple, FVector2D& PCA, TArray<ETipoCasilla>& CasillasExistentesSimplificado);
+	void ComprobarSiHayCasillasAdyacentes(FVector2D PosicionCasillas, TArray<ETipoCasilla> MapaSimple, TArray<FVector2D>& PCA, TArray<ETipoCasilla>& CasillasExistentesSimplificado);
 
 	UFUNCTION()
 	int ObtenerIndexConPosicionCasillasOZonas(FVector2D Posicion, int TamanyoLadoArray);

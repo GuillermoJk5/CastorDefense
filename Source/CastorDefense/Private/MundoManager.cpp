@@ -80,25 +80,83 @@ void UMundoManager::SetEstados(FEstadoMundo InEstados)
     this->Estados = InEstados;
 }
 
-void UMundoManager::SetEstadosTieneQueSerInterseccion(bool InTieneQueSerInterseccion)
+UMundoManager* UMundoManager::SetEstadosZIndexCreados(TArray<int> InZIndexCreados)
+{
+    this->Estados.ZIndexCreados = InZIndexCreados;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosZIndexAdyacentes(TArray<int> InZIndexAdyacentes)
+{
+    this->Estados.ZIndexAdyacentes = InZIndexAdyacentes;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosZBuscarMas(bool InZBuscarMas)
+{
+    this->Estados.ZBuscarMas = InZBuscarMas;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosFin(bool InFin)
+{
+    this->Estados.Fin = InFin;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosTieneQueSerInterseccion(bool InTieneQueSerInterseccion)
 {
 	this->Estados.TieneQueSerInterseccion = InTieneQueSerInterseccion;
+    return this;
 }
 
-void UMundoManager::SetEstadosPosicionesPuentes(TArray<FVector2D> InPosicionesPuentes)
+UMundoManager* UMundoManager::SetEstadosMapaAPintar(TArray<ETipoCasilla> InMapaAPintar)
+{
+    this->Estados.MapaAPintar = InMapaAPintar;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosPosicionActual(FVector2D InPosicionActual)
+{
+    this->Estados.PosicionActual = InPosicionActual;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosMovimientoDinamico(TArray<FVector2D> InMovimientoDinamico)
+{
+    this->Estados.MovimientoDinamico = InMovimientoDinamico;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosCantidad(int InCantidad)
+{
+    this->Estados.Cantidad = InCantidad;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosZonaTerminada(bool InZonaTerminada)
+{
+    this->Estados.ZonaTerminada = InZonaTerminada;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosActually(uint8 InActually)
+{
+    this->Estados.Actually = InActually;
+    return this;
+}
+
+UMundoManager* UMundoManager::SetEstadosPosicionesPuentes(TArray<FVector2D> InPosicionesPuentes)
 {
     this->Estados.PosicionesPuentes = InPosicionesPuentes;
+    return this;
 }
 
 
-void UMundoManager::SetEstadosCantidadFinCiclos(int InCantidadFinCiclos)
+UMundoManager* UMundoManager::SetEstadosCantidadFinCiclos(int InCantidadFinCiclos)
 {
 	this->Estados.CantidadFinCiclos = InCantidadFinCiclos;
-}
-
-void UMundoManager::SetEstadosMapaAPintar(TArray<ETipoCasilla> InMapaAPintar)
-{
-	this->Estados.MapaAPintar = InMapaAPintar;
+    return this;
 }
 
 //Metodos
