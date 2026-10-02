@@ -49,6 +49,12 @@ public:
 	UFUNCTION(Category = "Setter")
 	void SetDatosCasillasPuentes(TArray<FDatosCasillas> InInterseccion);
 
+	UFUNCTION(Category = "Getter")
+	TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> GetHI();
+
+	UFUNCTION(Category = "Setter")
+	void SetHI(TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> InHI);
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -59,5 +65,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FDatosCasillas> DatosCasillasPuentes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tipos De Hierarchical Instances (HI)", meta = (AllowPrivateAccess = "true"))
+	TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> HI;
 
 };

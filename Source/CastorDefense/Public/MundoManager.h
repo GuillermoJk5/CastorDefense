@@ -132,10 +132,10 @@ public:
 	TArray<FVector2D> ObtenerPosiblesDiagonalesAdyacentes(FVector2D PosicionCentral, int TamanyoLadoMatriz);
 
 	UFUNCTION()
-	void InstanciarCasillas();
+	void CalcularCantidadCasillasAInstanciar();
 
 	UFUNCTION()
-	void GuardarInstancias(ETipoCasilla Tipo, int Cantidad);
+	void GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransform> Cantidad);
 
 	FORCEINLINE FVector2D ObtenerCoordenadasDeUnaZonaConIndex(int index) {
 

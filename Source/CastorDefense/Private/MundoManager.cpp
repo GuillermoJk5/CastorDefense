@@ -11,6 +11,9 @@
 #include "NavigationSystem.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Algo/Reverse.h"
+
 
 void UMundoManager::OnWorldBeginPlay(UWorld& InWorld)
 {
@@ -331,72 +334,39 @@ TArray<FVector2D> UMundoManager::ObtenerPosiblesDiagonalesAdyacentes(FVector2D P
     return IndexPosibles;
 }
 
-void UMundoManager::InstanciarCasillas()
+void UMundoManager::CalcularCantidadCasillasAInstanciar()
 {
-    TMap<ETipoCasilla, int> CantidadCasillasPorTipo;
+    TMap<ETipoCasilla, TArray<FTransform>> CantidadCasillasPorTipo;
     for (AZona* Zona : MapaZonas) {
-        for (FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
-            if (CantidadCasillasPorTipo.Contains(DatosCasilla.Tipo)) {
-                CantidadCasillasPorTipo[DatosCasilla.Tipo]++;
-            }
-            else {
-                CantidadCasillasPorTipo.Add(DatosCasilla.Tipo, 1);
-            }
+        for (const FDatosCasillas& DatosCasilla : Zona->GetDatosCasillas()) {
+            FTransform Transform;
+            Transform.SetLocation(FVector(
+                (DatosCasilla.GridPosition * TamanyoCasilla).X + Zona->GetActorLocation().X
+                , (DatosCasilla.GridPosition * TamanyoCasilla).Y + Zona->GetActorLocation().Y
+                , Zona->GetActorLocation().Z)
+            );
+            CantidadCasillasPorTipo[DatosCasilla.Tipo].Add(Transform);
         }
     }
     //FALTA AGREGAR HI
-    for (const TPair<ETipoCasilla, int>& LLaveValor : CantidadCasillasPorTipo) {
-        //UHierarchicalInstancedStaticMeshComponent* HI;
-        TArray<int> Index;
-        switch (LLaveValor.Key) {
-            case ETipoCasilla::NaN:
-                break;
-            case ETipoCasilla::Camino:
-            case ETipoCasilla::CaminoConectado:
-                /*HI = MeshDeCamino*/;
-                //Index = HI.AddInstances(LLaveValor.Value, false);
-                GuardarInstancias(LLaveValor.Key,LLaveValor.Value);
-                break;
-
-            case ETipoCasilla::Terreno:
-				/*HI = MeshDeCamino*/;
-				//Index = HI.AddInstances(LLaveValor.Value, false);
-				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
-                break;
-
-            case ETipoCasilla::Puente:
-            case ETipoCasilla::PuenteConectado:
-				/*HI = MeshDeCamino*/;
-				//Index = HI.AddInstances(LLaveValor.Value, false);
-				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
-                break;
-
-            case ETipoCasilla::Objetivo:
-				/*HI = MeshDeCamino*/;
-				//Index = HI.AddInstances(LLaveValor.Value, false);
-				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
-                break;
-
-            case ETipoCasilla::SpawnEnemigo:
-				/*HI = MeshDeCamino*/;
-				//Index = HI.AddInstances(LLaveValor.Value, false);
-				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
-                break;
-        }
+    for (const TPair<ETipoCasilla, TArray<FTransform>>& LLaveValor : CantidadCasillasPorTipo) {
+        GuardarEInstanciarCasillas(LLaveValor.Key, LLaveValor.Value);
     }
 }
 
-void UMundoManager::GuardarInstancias(ETipoCasilla Tipo, int Cantidad)
+void UMundoManager::GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransform> Cantidad)
 {
-    int Index = 0;
+    UHierarchicalInstancedStaticMeshComponent* HI = *MapaZonas[0]->GetHI().Find(Tipo);
+    TArray<int> Index = HI->AddInstances(Cantidad, false);
+    Algo::Reverse(Index);
     for (AZona* Zona : MapaZonas) {
         for (FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
             if (DatosCasilla.Tipo == Tipo) {
-                DatosCasilla.IndexLocal = Index;
-                if (Index + 1 >= Cantidad) {
+                DatosCasilla.IndexLocal = Index.Pop();
+                DatosCasilla.HIDuenyo = HI;
+                if (Index.Num()<=0) {
                     return;
                 }
-                Index++;
             }
         }
     }

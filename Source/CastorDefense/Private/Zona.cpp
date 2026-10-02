@@ -2,6 +2,7 @@
 
 
 #include "Zona.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 
 // Sets default values
 AZona::AZona()
@@ -57,4 +58,14 @@ TArray<FDatosCasillas> AZona::GetDatosCasillasPuentes()
 void AZona::SetDatosCasillasPuentes(TArray<FDatosCasillas> InDatosCasillas)
 {
 	this->DatosCasillas = InDatosCasillas;
+}
+
+TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> AZona::GetHI()
+{
+	return this->HI;
+}
+
+void AZona::SetHI(TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> InHI)
+{
+	this->HI = InHI;
 }

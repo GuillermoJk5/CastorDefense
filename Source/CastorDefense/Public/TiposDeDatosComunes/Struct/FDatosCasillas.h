@@ -7,6 +7,8 @@
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"
 #include "FDatosCasillas.generated.h"
 
+class UHierarchicalInstancedStaticMeshComponent;
+
 USTRUCT(BlueprintType)
 struct FDatosCasillas
 {
@@ -22,6 +24,9 @@ struct FDatosCasillas
 	FVector2D GridPosition;
 
 	UPROPERTY()
+	UHierarchicalInstancedStaticMeshComponent* HIDuenyo;
+
+	UPROPERTY()
 	bool Torreta;
 
 	UPROPERTY()
@@ -31,6 +36,7 @@ struct FDatosCasillas
 		:IndexLocal()
 		, Tipo()
 		, GridPosition(0.f, 0.f)
+		, HIDuenyo()
 		, Torreta()
 		, PuenteAsociado()
 	{
@@ -40,6 +46,7 @@ struct FDatosCasillas
 		:IndexLocal()
 		, Tipo(Tipo)
 		, GridPosition(GridPosition)
+		, HIDuenyo()
 		, Torreta(Torreta)
 		, PuenteAsociado(PuenteAsociado)
 	{
