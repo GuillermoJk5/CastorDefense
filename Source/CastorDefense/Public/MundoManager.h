@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 
 //Enum TipoCasillas
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
@@ -30,79 +31,79 @@ public:
 
 
 	//Getters y Setters
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	UZonaManager* GetZonaManager();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetZonaManager(UZonaManager* InZonaManager);
 
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	TArray<AZona*> GetMapaZonas();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetMapaZonas(TArray<AZona*> InMapaZonas);
 
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	float GetTamanyoCasilla();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetTamanyoCasilla(float InTamanyoCasilla);
 
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	int GetTamanyoLadoZona();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetTamanyoLadoZona(int InTamanyoLadoZona);
 
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	float GetTamanyoLadoMundo();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetTamanyoLadoMundo(int InTamanyoLadoMundo);
 
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	struct FEstadosMundo GetEstados();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetEstados(struct FEstadosMundo InEstados);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosZIndexCreados(TArray<int> InZIndexCreados);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosZIndexAdyacentes(TArray<int> InZIndexAdyacentes);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosZBuscarMas(bool InZBuscarMas);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosFin(bool InFin);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosPosicionesPuentes(TArray<FVector2D> InPosicionesPuentes);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosMapaAPintar(TArray<ETipoCasilla> InMapaAPintar);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosPosicionActual(FVector2D InPosicionActual);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosMovimientoDinamico(TArray<FVector2D> InMovimientoDinamico);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosCantidad(int InCantidad);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosZonaTerminada(bool InZonaTerminada);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosActually(uint8 InActually);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosTieneQueSerInterseccion(bool InTieneQueSerInterseccion);
 
-	UFUNCTION()
+	UFUNCTION(Category = "SetterEstados")
 	UMundoManager* SetEstadosCantidadFinCiclos(int InCantidadFinCiclos);
 
 	
@@ -129,6 +130,12 @@ public:
 	
 	UFUNCTION()
 	TArray<FVector2D> ObtenerPosiblesDiagonalesAdyacentes(FVector2D PosicionCentral, int TamanyoLadoMatriz);
+
+	UFUNCTION()
+	void InstanciarCasillas();
+
+	UFUNCTION()
+	void GuardarInstancias(ETipoCasilla Tipo, int Cantidad);
 
 	FORCEINLINE FVector2D ObtenerCoordenadasDeUnaZonaConIndex(int index) {
 

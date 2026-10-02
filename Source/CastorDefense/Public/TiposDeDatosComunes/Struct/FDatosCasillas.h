@@ -36,8 +36,8 @@ struct FDatosCasillas
 	{
 	}
 
-	FDatosCasillas(int Index, ETipoCasilla Tipo, FVector2D GridPosition,bool Torreta, APuente* PuenteAsociado)
-		:IndexLocal(Index)
+	FDatosCasillas(ETipoCasilla Tipo, FVector2D GridPosition,bool Torreta, APuente* PuenteAsociado)
+		:IndexLocal()
 		, Tipo(Tipo)
 		, GridPosition(GridPosition)
 		, Torreta(Torreta)

@@ -18,7 +18,46 @@ void UMundoManager::OnWorldBeginPlay(UWorld& InWorld)
 
 	ZonaManager = InWorld.GetSubsystem<UZonaManager>();
 
+    CrearNavMesh();
+    MapaZonas.Reserve(TamanyoLadoMundo * TamanyoLadoMundo);
+    int indexCentral = ((TamanyoLadoMundo * TamanyoLadoMundo) - 1) / 2;
+
+    //Generar Zona Inicial
+   AZona* Zona = ZonaManager->GenerarZonaInicial(ObtenerCoordenadasDeUnaZonaConIndex(indexCentral));
+
+   MapaZonas.Insert(Zona, indexCentral);
+
+   //Obtiene el Nucleo
+   //¿?
+   
+   //Generar Zonas Esquinas
+   GenerarEsquinaMundo(0);
+   GenerarEsquinaMundo(TamanyoLadoMundo - 1);
+   GenerarEsquinaMundo(TamanyoLadoMundo * TamanyoLadoMundo - TamanyoLadoMundo);
+   GenerarEsquinaMundo(TamanyoLadoMundo * TamanyoLadoMundo - 1);
+
+  
+   SetEstadosZIndexCreados( TArray<int> {indexCentral});
+
+  //Generar Zonas Restantes
+      do {
+
+      GenerarZonasDesdeInicio();
+
+      if (Estados.Actually > 50) {
+        //AQUI SE HACE UN DELAY
+          Estados.Actually = 0;
+      }else{
+          Estados.Actually++;
+      }
+
+      } while (Estados.Fin == false);
+
+      ZonaManager->AsociarPuentesConZonas(MapaZonas);
 }
+
+
+
 
 UZonaManager* UMundoManager::GetZonaManager() {
     return ZonaManager;
@@ -191,19 +230,19 @@ AZona* UMundoManager::GenerarEsquinaMundo(int index)
 }
 
 void UMundoManager::GenerarZonasDesdeInicio()
-{   
+{
     TArray<AZona*> ZonasAdyacentes;
     TArray<int> ZonasVacias;
-    
+
     if (Estados.ZBuscarMas) {
         for (int item : Estados.ZIndexCreados) {
             FVector2D Coordenadas = ObtenerCoordenadasDeUnaZonaConIndex(item);
-            ComprobarZonasAdyacentes(Coordenadas,ZonasAdyacentes,ZonasVacias);
+            ComprobarZonasAdyacentes(Coordenadas, ZonasAdyacentes, ZonasVacias);
 
             for (int item2 : ZonasVacias) {
                 Estados.ZIndexAdyacentes.AddUnique(item2);
             }
-        } 
+        }
     }
 
     if (Estados.ZIndexAdyacentes.IsEmpty()) {
@@ -211,18 +250,19 @@ void UMundoManager::GenerarZonasDesdeInicio()
     }
     else {
 
-       // AZona* Zona = GetZonaManager()->GenerarZona(ObtenerCoordenadasDeUnaZonaConIndex(Estados.ZIndexAdyacentes[0]));
-      //  if (Zona.IsDataValid()){
-     //       MapaZonas[Estados.ZIndexAdyacentes[0]] = Zona;
-        Estados.ZIndexCreados.Add(Estados.ZIndexAdyacentes[0]);
-        Estados.ZIndexAdyacentes.Remove(Estados.ZIndexAdyacentes[0]);
+        AZona* Zona = GetZonaManager()->GenerarZona(ObtenerCoordenadasDeUnaZonaConIndex(Estados.ZIndexAdyacentes[0]));
+        if (Zona) {
 
-        if (Estados.ZIndexAdyacentes.IsEmpty()) Estados.ZBuscarMas = true;
+            MapaZonas[Estados.ZIndexAdyacentes[0]] = Zona;
+            Estados.ZIndexCreados.Add(Estados.ZIndexAdyacentes[0]);
+            Estados.ZIndexAdyacentes.Remove(Estados.ZIndexAdyacentes[0]);
 
-       }
+            if (Estados.ZIndexAdyacentes.IsEmpty()) Estados.ZBuscarMas = true;
+
+        }
     }
 
-
+}
 
 void UMundoManager::ComprobarZonasAdyacentes(FVector2D Coordenada, TArray<AZona*>& ZonasAdyacentes, TArray<int>& ZonasVacias)
 {
@@ -289,4 +329,75 @@ TArray<FVector2D> UMundoManager::ObtenerPosiblesDiagonalesAdyacentes(FVector2D P
     }
 
     return IndexPosibles;
+}
+
+void UMundoManager::InstanciarCasillas()
+{
+    TMap<ETipoCasilla, int> CantidadCasillasPorTipo;
+    for (AZona* Zona : MapaZonas) {
+        for (FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
+            if (CantidadCasillasPorTipo.Contains(DatosCasilla.Tipo)) {
+                CantidadCasillasPorTipo[DatosCasilla.Tipo]++;
+            }
+            else {
+                CantidadCasillasPorTipo.Add(DatosCasilla.Tipo, 1);
+            }
+        }
+    }
+    //FALTA AGREGAR HI
+    for (const TPair<ETipoCasilla, int>& LLaveValor : CantidadCasillasPorTipo) {
+        //UHierarchicalInstancedStaticMeshComponent* HI;
+        TArray<int> Index;
+        switch (LLaveValor.Key) {
+            case ETipoCasilla::NaN:
+                break;
+            case ETipoCasilla::Camino:
+            case ETipoCasilla::CaminoConectado:
+                /*HI = MeshDeCamino*/;
+                //Index = HI.AddInstances(LLaveValor.Value, false);
+                GuardarInstancias(LLaveValor.Key,LLaveValor.Value);
+                break;
+
+            case ETipoCasilla::Terreno:
+				/*HI = MeshDeCamino*/;
+				//Index = HI.AddInstances(LLaveValor.Value, false);
+				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
+                break;
+
+            case ETipoCasilla::Puente:
+            case ETipoCasilla::PuenteConectado:
+				/*HI = MeshDeCamino*/;
+				//Index = HI.AddInstances(LLaveValor.Value, false);
+				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
+                break;
+
+            case ETipoCasilla::Objetivo:
+				/*HI = MeshDeCamino*/;
+				//Index = HI.AddInstances(LLaveValor.Value, false);
+				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
+                break;
+
+            case ETipoCasilla::SpawnEnemigo:
+				/*HI = MeshDeCamino*/;
+				//Index = HI.AddInstances(LLaveValor.Value, false);
+				GuardarInstancias(LLaveValor.Key, LLaveValor.Value);
+                break;
+        }
+    }
+}
+
+void UMundoManager::GuardarInstancias(ETipoCasilla Tipo, int Cantidad)
+{
+    int Index = 0;
+    for (AZona* Zona : MapaZonas) {
+        for (FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
+            if (DatosCasilla.Tipo == Tipo) {
+                DatosCasilla.IndexLocal = Index;
+                if (Index + 1 >= Cantidad) {
+                    return;
+                }
+                Index++;
+            }
+        }
+    }
 }

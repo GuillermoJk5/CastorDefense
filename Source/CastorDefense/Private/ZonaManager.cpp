@@ -13,6 +13,8 @@ void UZonaManager::OnWorldBeginPlay(UWorld& InWorld)
     Super::OnWorldBeginPlay(InWorld);
 
     MundoManager = InWorld.GetSubsystem<UMundoManager>();
+
+
 }
 
 
@@ -252,7 +254,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             
                 if (Vector.Y > 0) {
                    //El Puente de Zona Previa se encuentra Arriba, Crearemos el puente de la nueva Abajo
-                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas& item : ZonaPrevia->GetDatosCasillasPuentes()) {
                     
                         if (item.GridPosition.Y > PosicionPuenteZonaPrevia.Y) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -262,7 +264,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
                 }
                 else {
                     //El Puente de Zona Previa se encuentra Abajo, Crearemos el puente de la nueva Arriba
-                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas& item : ZonaPrevia->GetDatosCasillasPuentes()) {
 
                         if (item.GridPosition.Y < PosicionPuenteZonaPrevia.Y) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -275,7 +277,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             
                 if (Vector.X > 0) {
                     //El Puente de Zona Previa se encuentra Derecha, Crearemos el puente de la nueva Izquierda
-                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas& item : ZonaPrevia->GetDatosCasillasPuentes()) {
 
                         if (item.GridPosition.X > PosicionPuenteZonaPrevia.X) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -286,7 +288,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
                 }
                 else {
                     //El Puente de Zona Previa se encuentra Izquierda, Crearemos el puente de la nueva Derecha
-                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas& item : ZonaPrevia->GetDatosCasillasPuentes()) {
 
                         if (item.GridPosition.X < PosicionPuenteZonaPrevia.X) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -354,7 +356,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             if (Diagonales) {
 				AZona* Zona = MundoManager->GetMapaZonas()[ObtenerIndexConPosicionCasillasOZonas(PosicionZonaDiagonalANueva, MundoManager->GetTamanyoLadoMundo())];
 				if (Zona) {
-					for (const FDatosCasillas DatosPuente : Zona->GetDatosCasillasPuentes()) {
+					for (const FDatosCasillas& DatosPuente : Zona->GetDatosCasillasPuentes()) {
 						float Distancia = FVector2D::Distance(
                             ((DatosPuente.GridPosition * MundoManager->GetTamanyoCasilla()) + (PosicionZonaDiagonalANueva * ladoZona))
                             , ((CasillaPuenteZonaNueva * MundoManager->GetTamanyoCasilla()) + CoordenadasZonaNueva)
@@ -456,13 +458,13 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
             case ETipoCasilla::NaN:
             case ETipoCasilla::Terreno:
                
-                Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Terreno, Posicion, false, nullptr));
+                Zona->GetDatosCasillas().Add(FDatosCasillas(ETipoCasilla::Terreno, Posicion, false, nullptr));
                 
                 break;
             case ETipoCasilla::Camino:
             case ETipoCasilla::CaminoConectado:
 
-				Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Camino, Posicion, false, nullptr));
+				Zona->GetDatosCasillas().Add(FDatosCasillas(ETipoCasilla::Camino, Posicion, false, nullptr));
 
                 break;
             case ETipoCasilla::Puente:
@@ -479,15 +481,15 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
                 if (Puente) {
 
                     Puente->SetActorHiddenInGame(true);
-                    Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Puente, Posicion, false, Puente));
-                    Zona->GetDatosCasillasPuentes().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Puente, Posicion, false, Puente));
+                    Zona->GetDatosCasillas().Add(FDatosCasillas(ETipoCasilla::Puente, Posicion, false, Puente));
+                    Zona->GetDatosCasillasPuentes().Add(FDatosCasillas(ETipoCasilla::Puente, Posicion, false, Puente));
 
                 }
             }
                 break;
             case ETipoCasilla::Objetivo:
             {
-                Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Objetivo, Posicion, false, nullptr));
+                Zona->GetDatosCasillas().Add(FDatosCasillas(ETipoCasilla::Objetivo, Posicion, false, nullptr));
                 Posicion = (Posicion * MundoManager->GetTamanyoCasilla());
 
                 ANucleo* Nucleo = GetWorld()->SpawnActor<ANucleo>(
@@ -499,7 +501,7 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
             }
                 break;
             case ETipoCasilla::SpawnEnemigo:
-                Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::SpawnEnemigo, Posicion, false, nullptr));
+                Zona->GetDatosCasillas().Add(FDatosCasillas(ETipoCasilla::SpawnEnemigo, Posicion, false, nullptr));
                 break;
         }
         Index++;
