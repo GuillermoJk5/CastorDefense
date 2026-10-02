@@ -3,15 +3,19 @@
 #pragma once
 
 //Valorar llevar el enum y/o Struct que se usen para varias variables a un sitio externo (archivo .h sin cpp, e incluirlo en todas las que usen dichas variables)
-#include "MundoManager.h"
+//#include "MundoManager.h"
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+
+//Enum TipoCasillas
+#include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
 #include "ZonaManager.generated.h"
 
 
 class UPinguinoManager;
 class UMundoManager;
+class ANucleo;
 class AZona;
 
 /**
@@ -39,28 +43,26 @@ public:
 	UFUNCTION()
 	void SetPinguinoManager(UPinguinoManager* InPinguinoManager);
 
-	//FALTA
+	//FALTA HIX
 	UFUNCTION()
 	int InstanciarCasilla(/*¿StaticMesh?* HIX, */FVector2D PosicionCasilla);
 
-	//FALTA PUENTE
 	UFUNCTION()
-	void RotarPuentes(/*UPuente* Puente, */FVector2D PosicionCasilla);
+	FRotator RotarPuentes(FVector2D PosicionCasilla);
 
-	//FALTA COMPROBARZONASADYACENTES
-	//FALTA PINGUINOBORRACHO
 	UFUNCTION()
 	AZona* GenerarZona(FVector2D CoordenadasZona);
 
+	//FALTA ZonaInicial
 	UFUNCTION()
 	AZona* GenerarZonaInicial(FVector2D CoordenadasZona);
 
+	//FALTA ZonaPortal
 	UFUNCTION()
 	AZona* GenerarZonaPortal(FVector2D CoordenadasZona);
 
-	//FALTA ZONA
-	//UFUNCTION()
-	//void HabilitarZonas(UZona* Zona);
+	UFUNCTION()
+	void HabilitarZonas(AZona* Zona);
 
 	UFUNCTION()
 	FVector2D CalcularPosicionPuenteZonaPrevia(AZona* Zona, FVector2D CoordenadasZonaNueva, FVector2D PosicionZonaPrevia);
@@ -77,18 +79,18 @@ public:
 	UFUNCTION()
 	void ComprobarGeneracionDePuenteEsquinado(TArray<FVector2D> Puentes, FVector2D PuenteNuevo, bool& Correcto, FVector2D& MovimientoPosible);
 
+	//FALTA Objetivo, HIX
 	UFUNCTION()
-	void PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado/*, UZona Zona*/);
+	void PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, AZona* Zona);
 
 	UFUNCTION()
 	void BuscarZonasDiagonales(FVector2D PosicionNuevoPuente, FVector2D PosicionNuevaZona, bool& Diagonales, FVector2D& PosicionZonaDiagonalANueva);
 
 	UFUNCTION()
-	void AsociarPuentesConZonas(/*TArray<UZona> Zona*/);
+	void AsociarPuentesConZonas(TArray<AZona*> MapaZonas);
 
 	UFUNCTION()
 	FVector2D VectorDeLadoZona();
-
 
 	FORCEINLINE bool ComprobacionesPuentesEnZonaInicial(int X, int Y, int TamanyoLadoZona) {
 		return(
@@ -98,65 +100,12 @@ public:
 			|| (Y == TamanyoLadoZona && X == 5 )
 		);
 	}
+	UFUNCTION()
+	ETipoCasilla ComprobacionesDeCaminoYPuenteEnZonasPortal(int opcion, int X, int Y);
 
-	FORCEINLINE ETipoCasilla ComprobacionesDeCaminoYPuenteEnZonasPortal(int opcion, int X, int Y) {
-		bool NoEsTerreno = false;
-		switch (opcion) {
-		case 0:
-			if ((X == 5 && Y >= 5) || (Y == 5 && X >= 5)) {
-				NoEsTerreno = true;
-			}
-			break;
-		case 1:
-			if ((X == 5 && Y <= 5) || (Y == 5 && X >= 5)) {
-				NoEsTerreno = true;
-			}
-			break;
-		case 2:
-			if ((X == 5 && Y >= 5) || (Y == 5 && X <= 5)) {
-				NoEsTerreno = true;
-			}
-			break;
-		case 3:
-			if ((X == 5 && Y <= 5) || (Y == 5 && X <= 5)) {
-				NoEsTerreno = true;
-			}
-			break;
+	UFUNCTION()
+	bool ComprobarSiHayInterseccion(FVector2D CoordenadasZona, int CantidadFinCilos);
 
-		}
-		if (NoEsTerreno) {
-			if (ComprobacionesPuentesEnZonaInicial(X, Y, MundoManager->GetTamanyoLadoZona() - 1)) {
-				return ETipoCasilla::Puente;
-			}
-			else if (X == 5 && Y == 5) {
-				return ETipoCasilla::SpawnEnemigo;
-			}
-			else {
-				return ETipoCasilla::Camino;
-			}
-		}
-		return ETipoCasilla::Terreno;
-	}
-
-	FORCEINLINE bool ComprobarSiHayInterseccion(FVector2D CoordenadasZona, int CantidadFinCilos) {
-	
-		FVector2D Vector = CoordenadasZona / VectorDeLadoZona();
-
-		if (MundoManager->GetTamanyoLadoMundo() - 1 == Vector.X 
-			&& Vector.X == 0
-			&& MundoManager->GetTamanyoLadoMundo() - 1 == Vector.Y
-			&& Vector.Y == 0) {
-		
-			return true;
-		}
-		else if(CantidadFinCilos != 1) {
-		
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Migracion");

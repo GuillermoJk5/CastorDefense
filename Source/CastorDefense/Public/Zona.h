@@ -4,57 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+//Enum ETipoCasillas
+#include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
+
+//Struct
+#include "TiposDeDatosComunes/Struct/FDatosCasillas.h"
 #include "Zona.generated.h"
 
 class APuente;
-
-UENUM(BlueprintType)
-enum class ETipoCasillaAExportar : uint8
-{
-	NaN  UMETA(DisplayName = "NaN")
-	, Terreno UMETA(DisplayName = "Terreno")
-	, Camino  UMETA(DisplayName = "Camino")
-	, CaminoConectado  UMETA(DisplayName = "CaminoConectado")
-	, Puente  UMETA(DisplayName = "Puente")
-	, PuenteConectado  UMETA(DisplayName = "PuenteConectado")
-	, Objetivo  UMETA(DisplayName = "Objetivo")
-	, SpawnEnemigo  UMETA(DisplayName = "SpawnEnemigo")
-};
-
-USTRUCT(BlueprintType)
-struct FDatosCasillas
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	int IndexLocal;
-
-	UPROPERTY()
-	TArray<ETipoCasillaAExportar> Tipo;
-
-	UPROPERTY()
-	FVector2D GridPosition;
-
-	UPROPERTY()
-	bool zBuscarMas;
-
-	UPROPERTY()
-	bool Torreta;
-
-	UPROPERTY()
-	APuente* PuenteAsociado;
-
-	FDatosCasillas()
-		:IndexLocal()
-		, Tipo()
-		, GridPosition(0.f, 0.f)
-		, zBuscarMas()
-		, Torreta()
-		,PuenteAsociado()
-	{
-	}
-
-};
 
 UCLASS()
 class CASTORDEFENSE_API AZona : public AActor
@@ -90,6 +48,7 @@ public:
 
 	UFUNCTION(Category = "Setter")
 	void SetDatosCasillasPuentes(TArray<FDatosCasillas> InInterseccion);
+
 private:
 
 	UPROPERTY(EditAnywhere)

@@ -4,7 +4,7 @@
 #include "PinguinoManager.h"
 #include "MundoManager.h" 
 #include "Zona.h"
-
+#include "Nucleo.h"
 
 
 //Se carga cuando existen todos los WolrdSubSystem
@@ -44,8 +44,8 @@ int UZonaManager::InstanciarCasilla(/*¿StaticMesh?* HIX, */FVector2D PosicionCas
     return 0;
 }
 
-//FALTA PUENTE
-void UZonaManager::RotarPuentes(/*UPuente* Puente, */FVector2D PosicionCasilla) {
+
+FRotator UZonaManager::RotarPuentes(FVector2D PosicionCasilla) {
     FRotator Rotation;
 
     if (PosicionCasilla.X == (MundoManager->GetTamanyoLadoZona() - 1) || PosicionCasilla.X == 0) {
@@ -64,11 +64,9 @@ void UZonaManager::RotarPuentes(/*UPuente* Puente, */FVector2D PosicionCasilla) 
             Rotation = FRotator(0.f, 0.f, 0.f);
         }
     }
-    //Puente->SetActorRotation(Rotation, false);
+    return Rotation;
 }
 
-//FALTA COMPROBARZONASADYACENTES
-//FALTA PINGUINOBORRACHO
 
 AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
 {
@@ -136,10 +134,11 @@ AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
             if(Zona){
 				Zona->SetInterseccion(ComprobarSiHayInterseccion(CoordenadasZona, MundoManager->GetEstados().CantidadFinCiclos));
 
-				MundoManager->SetEstadosTieneQueSerInterseccion(false);
-				MundoManager->SetEstadosCantidadFinCiclos(0);
+				MundoManager
+                    ->SetEstadosTieneQueSerInterseccion(false)
+                    ->SetEstadosCantidadFinCiclos(0);
 
-				PintarMapaDeCasillas(MundoManager->GetEstados().MapaAPintar);
+				PintarMapaDeCasillas(MundoManager->GetEstados().MapaAPintar, Zona);
 
 				MundoManager->SetEstadosMapaAPintar(TArray<ETipoCasilla>());
 				Zona->SetActorHiddenInGame(true);
@@ -158,7 +157,6 @@ AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
 AZona* UZonaManager::GenerarZonaInicial(FVector2D CoordenadasZona)
 {
     TArray<ETipoCasilla> MapaCasillasSimples;
-    //ETipoCasilla TipoCasilla;
 
     for (int y = 0; y < (MundoManager->GetTamanyoLadoZona() - 1); y++) {
         for (int x = 0; x < (MundoManager->GetTamanyoLadoZona() - 1); x++) {
@@ -178,7 +176,7 @@ AZona* UZonaManager::GenerarZonaInicial(FVector2D CoordenadasZona)
             }
         }
     }
-    //SpawnActorZonaInicial
+    //FALTA SpawnActorZonaInicial
     return nullptr;
 }
 
@@ -210,9 +208,34 @@ AZona* UZonaManager::GenerarZonaPortal(FVector2D CoordenadasZona)
         }
     }
 
-    //SpawnactorZonaPortal
+    //FALTA SpawnactorZonaPortal
 
     return nullptr;
+}
+
+void UZonaManager::HabilitarZonas(AZona* Zona)
+{
+    Zona->SetActorHiddenInGame(false);
+
+    for (const FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
+        DatosCasilla.PuenteAsociado->SetActorHiddenInGame(false);
+        if (!DatosCasilla.PuenteAsociado->GetConectadoCon()->IsHidden()) {
+            DatosCasilla.PuenteAsociado->BajarPuente();
+        }
+    }
+    TArray<AZona*> ZonasAdyacentes; 
+    TArray<int> ZonasVacias;
+    MundoManager->ComprobarZonasAdyacentes(FVector2D(Zona->GetActorLocation().Y, Zona->GetActorLocation().X), ZonasAdyacentes, ZonasVacias);
+    for (AZona* ZonaAdyacente : ZonasAdyacentes) {
+        if (!ZonaAdyacente->IsHidden()) {
+            for (const FDatosCasillas DatosCasilla : ZonaAdyacente->GetDatosCasillas()) {
+                if (Zona == DatosCasilla.PuenteAsociado->GetConectadoCon()) {
+                   
+                    DatosCasilla.PuenteAsociado->BajarPuente();
+                }
+            }
+        }
+    }
 }
 
 FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVector2D CoordenadasZonaNueva, FVector2D PosicionZonaPrevia)
@@ -229,7 +252,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             
                 if (Vector.Y > 0) {
                    //El Puente de Zona Previa se encuentra Arriba, Crearemos el puente de la nueva Abajo
-                    for (FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
                     
                         if (item.GridPosition.Y > PosicionPuenteZonaPrevia.Y) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -239,7 +262,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
                 }
                 else {
                     //El Puente de Zona Previa se encuentra Abajo, Crearemos el puente de la nueva Arriba
-                    for (FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
 
                         if (item.GridPosition.Y < PosicionPuenteZonaPrevia.Y) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -252,7 +275,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             
                 if (Vector.X > 0) {
                     //El Puente de Zona Previa se encuentra Derecha, Crearemos el puente de la nueva Izquierda
-                    for (FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
 
                         if (item.GridPosition.X > PosicionPuenteZonaPrevia.X) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -263,7 +286,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
                 }
                 else {
                     //El Puente de Zona Previa se encuentra Izquierda, Crearemos el puente de la nueva Derecha
-                    for (FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
+                    for (const FDatosCasillas item : ZonaPrevia->GetDatosCasillasPuentes()) {
 
                         if (item.GridPosition.X < PosicionPuenteZonaPrevia.X) {
                             PosicionPuenteZonaPrevia = item.GridPosition;
@@ -275,7 +298,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             }
     }
     else {
-        bool PuenteCorrecto;
+        bool PuenteCorrecto = true;
         do{
 			//NO existe ZonaPrevia
 
@@ -331,7 +354,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
             if (Diagonales) {
 				AZona* Zona = MundoManager->GetMapaZonas()[ObtenerIndexConPosicionCasillasOZonas(PosicionZonaDiagonalANueva, MundoManager->GetTamanyoLadoMundo())];
 				if (Zona) {
-					for (FDatosCasillas DatosPuente : Zona->GetDatosCasillasPuentes()) {
+					for (const FDatosCasillas DatosPuente : Zona->GetDatosCasillasPuentes()) {
 						float Distancia = FVector2D::Distance(
                             ((DatosPuente.GridPosition * MundoManager->GetTamanyoCasilla()) + (PosicionZonaDiagonalANueva * ladoZona))
                             , ((CasillaPuenteZonaNueva * MundoManager->GetTamanyoCasilla()) + CoordenadasZonaNueva)
@@ -355,7 +378,7 @@ FVector2D UZonaManager::CalcularPosicionPuenteZonaPrevia(AZona* ZonaPrevia, FVec
 			else {
 				return CasillaPuenteZonaNueva;
 			}
-        } while (!PuenteCorrecto);
+        } while (PuenteCorrecto);
     }
     return CasillaPuenteZonaNueva;
 }
@@ -422,7 +445,7 @@ void UZonaManager::ComprobarGeneracionDePuenteEsquinado(TArray<FVector2D> Puente
     }
 }
 
-void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado/*, UZona Zona*/)
+void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, AZona* Zona)
 {
     int Index = 0;
 
@@ -432,16 +455,51 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado/*,
         switch (TipoCasilla) {
             case ETipoCasilla::NaN:
             case ETipoCasilla::Terreno:
+               
+                Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Terreno, Posicion, false, nullptr));
+                
                 break;
             case ETipoCasilla::Camino:
             case ETipoCasilla::CaminoConectado:
+
+				Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Camino, Posicion, false, nullptr));
+
                 break;
             case ETipoCasilla::Puente:
             case ETipoCasilla::PuenteConectado:
+            {
+                FVector2D PosiciondelPuente = MundoManager->GetTamanyoCasilla() * Posicion + FVector2D(Zona->GetActorLocation().Y, Zona->GetActorLocation().X);
+
+                APuente* Puente = GetWorld()->SpawnActor<APuente>(
+
+                    AZona::StaticClass(),
+                    FTransform(RotarPuentes(Posicion), FVector(PosiciondelPuente.Y, PosiciondelPuente.X, 0), FVector(2, 2, 2))
+
+                );
+                if (Puente) {
+
+                    Puente->SetActorHiddenInGame(true);
+                    Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Puente, Posicion, false, Puente));
+                    Zona->GetDatosCasillasPuentes().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Puente, Posicion, false, Puente));
+
+                }
+            }
                 break;
             case ETipoCasilla::Objetivo:
+            {
+                Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::Objetivo, Posicion, false, nullptr));
+                Posicion = (Posicion * MundoManager->GetTamanyoCasilla());
+
+                ANucleo* Nucleo = GetWorld()->SpawnActor<ANucleo>(
+
+                    ANucleo::StaticClass(),
+                    FTransform(FRotator(), FVector(Posicion.Y + Zona->GetActorLocation().Y, Posicion.X + Zona->GetActorLocation().X, Zona->GetActorLocation().Z + 100), FVector(1, 1, 1))
+
+                );
+            }
                 break;
             case ETipoCasilla::SpawnEnemigo:
+                Zona->GetDatosCasillas().Add(FDatosCasillas(InstanciarCasilla(/*¿StaticMesh?* HIX, */Posicion), ETipoCasilla::SpawnEnemigo, Posicion, false, nullptr));
                 break;
         }
         Index++;
@@ -484,15 +542,103 @@ void UZonaManager::BuscarZonasDiagonales(FVector2D PosicionNuevoPuente, FVector2
     else {
         return;
     }
-    //if(MundoManager->ComprobarLimitesDeMatriz(ZonaDiagonalAComprobar, MundoManager->TamanyoLadoMundo)){Diagonales = true;PosicionNuevaZona = ZonaDiagonalAComprobar;}
+    if(MundoManager->ComprobarLimitesDeMatriz(ZonaDiagonalAComprobar, MundoManager->GetTamanyoLadoMundo())){
+
+        Diagonales = true;
+        PosicionNuevaZona = ZonaDiagonalAComprobar;
+    }
 }
 
-void UZonaManager::AsociarPuentesConZonas(/*TArray<UZona> Zona*/)
+void UZonaManager::AsociarPuentesConZonas(TArray<AZona*> MapaZonas)
 {
+    int IndexASumar;
+
+    for (AZona* item : MapaZonas) {
+        int Index = 0;
+        for (FDatosCasillas itemdatos : item->GetDatosCasillasPuentes()) {
+
+            if (itemdatos.GridPosition.X == 0) {
+                IndexASumar = -1;
+            }
+            else if(itemdatos.GridPosition.X == 10){
+				IndexASumar = 1;
+			}
+			else if (itemdatos.GridPosition.Y == 0) {
+				IndexASumar = MundoManager->GetTamanyoLadoMundo() * -1;
+            }
+            else {
+                IndexASumar = MundoManager->GetTamanyoLadoMundo();
+            }
+            
+            itemdatos.PuenteAsociado->SetConectadoCon(MapaZonas[Index + IndexASumar]);
+            
+        }
+        Index++;
+    }
 }
 
 FVector2D UZonaManager::VectorDeLadoZona()
 {
   return FVector2D(MundoManager->GetTamanyoCasilla()* MundoManager->GetTamanyoLadoZona() + (MundoManager->GetTamanyoCasilla() * 2)
       , MundoManager->GetTamanyoCasilla() * MundoManager->GetTamanyoLadoZona() + (MundoManager->GetTamanyoCasilla() * 2));
+}
+
+ETipoCasilla UZonaManager::ComprobacionesDeCaminoYPuenteEnZonasPortal(int opcion, int X, int Y)
+{
+    bool NoEsTerreno = false;
+    switch (opcion) {
+    case 0:
+        if ((X == 5 && Y >= 5) || (Y == 5 && X >= 5)) {
+            NoEsTerreno = true;
+        }
+        break;
+    case 1:
+        if ((X == 5 && Y <= 5) || (Y == 5 && X >= 5)) {
+            NoEsTerreno = true;
+        }
+        break;
+    case 2:
+        if ((X == 5 && Y >= 5) || (Y == 5 && X <= 5)) {
+            NoEsTerreno = true;
+        }
+        break;
+    case 3:
+        if ((X == 5 && Y <= 5) || (Y == 5 && X <= 5)) {
+            NoEsTerreno = true;
+        }
+        break;
+
+    }
+    if (NoEsTerreno) {
+        if (ComprobacionesPuentesEnZonaInicial(X, Y, MundoManager->GetTamanyoLadoZona() - 1)) {
+            return ETipoCasilla::Puente;
+        }
+        else if (X == 5 && Y == 5) {
+            return ETipoCasilla::SpawnEnemigo;
+        }
+        else {
+            return ETipoCasilla::Camino;
+        }
+    }
+    return ETipoCasilla::Terreno;
+}
+
+bool UZonaManager::ComprobarSiHayInterseccion(FVector2D CoordenadasZona, int CantidadFinCilos)
+{
+    FVector2D Vector = CoordenadasZona / VectorDeLadoZona();
+
+    if (MundoManager->GetTamanyoLadoMundo() - 1 == Vector.X
+        && Vector.X == 0
+        && MundoManager->GetTamanyoLadoMundo() - 1 == Vector.Y
+        && Vector.Y == 0) {
+
+        return true;
+    }
+    else if (CantidadFinCilos != 1) {
+
+        return true;
+    }
+    else {
+        return false;
+    }
 }

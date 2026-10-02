@@ -58,4 +58,3 @@ void AZona::SetDatosCasillasPuentes(TArray<FDatosCasillas> InDatosCasillas)
 {
 	this->DatosCasillas = InDatosCasillas;
 }
-

@@ -26,10 +26,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(Category = "Getter")
-	AZona* GetZona();
+	AZona* GetConectadoCon();
 
 	UFUNCTION(Category = "Setter")
-	void SetZona(AZona* InZona);
+	void SetConectadoCon(AZona* InZona);
 
 	UFUNCTION(Category = "Getter")
 	bool GetBajado();
@@ -37,10 +37,13 @@ public:
 	UFUNCTION(Category = "Setter")
 	void SetBajado(bool InBajado);
 
+	UFUNCTION()
+	void BajarPuente();
+
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Migracion")
-	AZona* Zona;
+	AZona* ConectadoCon;
 
 	UPROPERTY(EditAnywhere, Category = "Migracion")
 	bool Bajado;

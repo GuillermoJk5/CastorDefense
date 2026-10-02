@@ -70,12 +70,12 @@ void UMundoManager::SetTamanyoLadoMundo(int InTamanyoLadoMundo)
     this->TamanyoLadoMundo = InTamanyoLadoMundo;
 }
 
-FEstadoMundo UMundoManager::GetEstados()
+FEstadosMundo UMundoManager::GetEstados()
 {
     return this->Estados;
 }
 
-void UMundoManager::SetEstados(FEstadoMundo InEstados)
+void UMundoManager::SetEstados(FEstadosMundo InEstados)
 {
     this->Estados = InEstados;
 }

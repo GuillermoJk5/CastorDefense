@@ -7,73 +7,13 @@
 
 //Enum TipoCasillas
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
+
+//Struck
+#include "TiposDeDatosComunes/Struct/FEstadosMundo.h"
 #include "MundoManager.generated.h"
 
 class UZonaManager;
 class AZona;
-
-USTRUCT(BlueprintType)
-struct FEstadoMundo
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	TArray<int> ZIndexCreados;
-
-	UPROPERTY()
-	TArray<int> ZIndexAdyacentes;
-
-	UPROPERTY()
-	bool ZBuscarMas;
-
-	UPROPERTY()
-	bool Fin;
-
-	UPROPERTY()
-	TArray<FVector2D> PosicionesPuentes;
-
-	UPROPERTY()
-	TArray<ETipoCasilla> MapaAPintar;
-
-	UPROPERTY()
-	FVector2D PosicionActual;
-
-	UPROPERTY()
-	TArray<FVector2D> MovimientoDinamico;
-
-	UPROPERTY()
-	int Cantidad;
-
-	UPROPERTY()
-	bool ZonaTerminada;
-
-	UPROPERTY()
-	uint8 Actually;
-
-	UPROPERTY()
-	bool TieneQueSerInterseccion;
-
-	UPROPERTY()
-	int CantidadFinCiclos;
-
-
-	FEstadoMundo() 
-		:ZIndexCreados()
-		,ZIndexAdyacentes()
-		,ZBuscarMas(true)
-		,Fin(false)
-		,PosicionesPuentes()
-		,MapaAPintar()
-		,PosicionActual(0.f , 0.f)
-		,MovimientoDinamico()
-		,Cantidad(0)
-		,ZonaTerminada(true)
-		,Actually(0)
-		,TieneQueSerInterseccion(false)
-		,CantidadFinCiclos(0)
-	{}
-
-};
 
 /**
  * 
@@ -121,10 +61,10 @@ public:
 	void SetTamanyoLadoMundo(int InTamanyoLadoMundo);
 
 	UFUNCTION()
-	struct FEstadoMundo GetEstados();
+	struct FEstadosMundo GetEstados();
 
 	UFUNCTION()
-	void SetEstados(struct FEstadoMundo InEstados);
+	void SetEstados(struct FEstadosMundo InEstados);
 
 	UFUNCTION()
 	UMundoManager* SetEstadosZIndexCreados(TArray<int> InZIndexCreados);
@@ -218,7 +158,7 @@ private:
 	int TamanyoLadoMundo;
 
 	UPROPERTY()
-	struct FEstadoMundo Estados;
+	struct FEstadosMundo Estados;
 
 	/*
 	UPROPERTY(EditAnywhere)

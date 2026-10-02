@@ -26,14 +26,14 @@ void APuente::Tick(float DeltaTime)
 
 }
 
-AZona* APuente::GetZona()
+AZona* APuente::GetConectadoCon()
 {
-	return this->Zona;
+	return this->ConectadoCon;
 }
 
-void APuente::SetZona(AZona* InZona)
+void APuente::SetConectadoCon(AZona* InConectadoCon)
 {
-	this->Zona = InZona;
+	this->ConectadoCon = InConectadoCon;
 }
 
 bool APuente::GetBajado()
@@ -44,5 +44,11 @@ bool APuente::GetBajado()
 void APuente::SetBajado(bool InBajado)
 {
 	this->Bajado = InBajado;
+}
+
+void APuente::BajarPuente()
+{
+	this->SetActorRelativeRotation(FRotator(0.f, 160.f, 0.f));
+	this->SetBajado(true);
 }
 

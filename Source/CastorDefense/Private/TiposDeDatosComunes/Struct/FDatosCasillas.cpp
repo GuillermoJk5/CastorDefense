@@ -1,0 +1,1 @@
+//Un Struct no requiere de cpp, y al menos en esta version de unreal no deja eliminarlo
