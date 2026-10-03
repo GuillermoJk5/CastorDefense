@@ -32,6 +32,16 @@ struct FDatosCasillas
 	UPROPERTY()
 	APuente* PuenteAsociado;
 
+	bool operator==(const FDatosCasillas& Other) const
+	{
+		return IndexLocal == Other.IndexLocal 
+			&& Tipo == Other.Tipo
+			&& GridPosition == Other.GridPosition
+			&& HIDuenyo == Other.HIDuenyo
+			&& Torreta == Other.Torreta
+			&& PuenteAsociado == Other.PuenteAsociado;
+	}
+
 	FDatosCasillas()
 		:IndexLocal()
 		, Tipo()
@@ -52,4 +62,27 @@ struct FDatosCasillas
 	{
 	}
 
+	FDatosCasillas(int IndexLocal, ETipoCasilla Tipo, FVector2D GridPosition, UHierarchicalInstancedStaticMeshComponent* HIDuenyo, bool Torreta, APuente* PuenteAsociado)
+		:IndexLocal(IndexLocal)
+		, Tipo(Tipo)
+		, GridPosition(GridPosition)
+		, HIDuenyo(HIDuenyo)
+		, Torreta(Torreta)
+		, PuenteAsociado(PuenteAsociado)
+	{
+	}
+
 };
+
+FORCEINLINE uint32 GetTypeHash(const FDatosCasillas& Key)
+{
+	uint32 Hash = 0;
+
+	Hash = HashCombine(Hash, GetTypeHash(Key.IndexLocal));
+	Hash = HashCombine(Hash, GetTypeHash(Key.Tipo));
+	Hash = HashCombine(Hash, GetTypeHash(Key.GridPosition));
+	Hash = HashCombine(Hash, GetTypeHash(Key.HIDuenyo));
+	Hash = HashCombine(Hash, GetTypeHash(Key.Torreta));
+	Hash = HashCombine(Hash, GetTypeHash(Key.PuenteAsociado));
+	return Hash;
+}

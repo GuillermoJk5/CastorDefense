@@ -1,10 +1,11 @@
 #include "ZonaManager.h"
 #include "Engine/Engine.h"
-
 #include "PinguinoManager.h"
 #include "MundoManager.h" 
 #include "Zona.h"
+#include "ZonaInicial.h"
 #include "Nucleo.h"
+
 
 
 //Se carga cuando existen todos los WolrdSubSystem
@@ -178,7 +179,14 @@ AZona* UZonaManager::GenerarZonaInicial(FVector2D CoordenadasZona)
             }
         }
     }
-    //FALTA SpawnActorZonaInicial
+        //Spawn Zona
+        AZonaInicial* ZonaInicial = GetWorld()->SpawnActor<AZonaInicial>(
+
+        AZonaInicial::StaticClass(),
+        FTransform(FRotator :: ZeroRotator, FVector(CoordenadasZona.X, CoordenadasZona.Y,0), FVector(1, 1, 1))
+
+    );
+
     return nullptr;
 }
 

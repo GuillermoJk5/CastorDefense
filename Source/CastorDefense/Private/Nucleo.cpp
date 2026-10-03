@@ -2,6 +2,7 @@
 
 
 #include "Nucleo.h"
+#include "Enemigo.h"
 
 // Sets default values
 ANucleo::ANucleo()
@@ -58,14 +59,19 @@ void ANucleo::Tick(float DeltaTime)
 
 void ANucleo::OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//FALTA ENEMIGO
-	//AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor)
-	/*if(Enemigo)
+	
+	AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor);
+	if(Enemigo)
 	{
 		PerderVida(Enemigo->GetDanyo());
 		Enemigo->Destruir();
+
+		if (Vida <= 0) {
+		
+			//PORHACER METODO PERDER
+		}
+
 	}
-	*/
 }
 
 void ANucleo::PerderVida(float Danyo){
