@@ -80,3 +80,10 @@ void ANucleo::PerderVida(float Danyo){
 
 }
 
+bool ANucleo::ActualizarEnergia(float CosteDeEnergia)
+{
+	EnergiaRestante = (EnergiaRestante + CosteDeEnergia) > EnergiaMax ? EnergiaMax : (EnergiaRestante + CosteDeEnergia);
+
+	return EnergiaRestante >= 0;
+}
+

@@ -42,6 +42,9 @@ public:
 	UFUNCTION()
 	void PerderVida(float Danyo);
 
+	UFUNCTION()
+	bool ActualizarEnergia(float CosteDeEnergia);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
