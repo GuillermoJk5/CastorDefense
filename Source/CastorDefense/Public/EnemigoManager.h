@@ -40,7 +40,7 @@ public:
 	void ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn);
 
 	UFUNCTION()
-	TArray<FDatosCasillas> CalcularCaminoASeguir(FVector2D CoordenadasOdjetivo, AZona* ZonaSpawn, FDatosCasillas DatosCasillaActual);
+	TArray<FDatosCasillas> CalcularCaminoASeguir(FVector2D CoordenadasObjetivo, AZona* ZonaSpawn, FDatosCasillas DatosCasillaActual);
 	
 	UFUNCTION()
 	TMap<FDatosCasillas, AZona*> ComprobarCaminosAdyacentes(AZona* Zona, FVector2D Posicion, TMap<FDatosCasillas, FDatosCasillas> CaminoFinal);

@@ -1,3 +1,2 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+//Un Struct no requiere de cpp, y al menos en esta version de unreal no deja eliminarlo
 

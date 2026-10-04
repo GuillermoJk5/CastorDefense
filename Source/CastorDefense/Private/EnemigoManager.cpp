@@ -5,14 +5,18 @@
 #include "MundoManager.h"
 #include "ZonaManager.h"
 #include "Nucleo.h"
-#include "Kismet/GameplayStatics.h"
-#include "Engine/Engine.h"
 #include "Enemigo.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Zona.h"
+
 #include "ClaseDeUtilidades.h"
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"
+#include "TiposDeDatosComunes/Struct/FMovimientoEnemigo.h"
+
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Engine/Engine.h"
 
 void UEnemigoManager::OnWorldBeginPlay(UWorld& InWorld)
 {
@@ -60,11 +64,11 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 
 }
 
-TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D CoordenadasOdjetivo, AZona* ZonaSpawn, FDatosCasillas DatosCasillaActual)
+TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D CoordenadasObjetivo, AZona* ZonaSpawn, FDatosCasillas DatosCasillaActual)
 {
 
 	//FALTA STRUCT
-	//TArray<FMovimientoEnemigo>
+	TArray<FMovimientoEnemigo> CaminosPosibles;
 	
 	
 	
@@ -143,7 +147,7 @@ void UEnemigoManager::ComprobarAdyacentesYX(FVector2D PosicionCentral, float Val
 				
 				AZona* ZonaAPasar = MundoManager->GetMapaZonas()[MundoManager->GetZonaManager()->ObtenerIndexConPosicionCasillasOZonas(VectorYX2, MundoManager->GetTamanyoLadoMundo())];
 					
-				for (FDatosCasillas item : ZonaAPasar->GetDatosCasillasPuentes()) {
+				for (const FDatosCasillas& item : ZonaAPasar->GetDatosCasillasPuentes()) {
 							
 					if (YX) {
 						if(item.GridPosition == FVector2D(VectorYX1.X, ValorComprobacionContraria)){
