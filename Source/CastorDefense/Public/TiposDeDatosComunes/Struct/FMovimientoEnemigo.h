@@ -29,7 +29,17 @@ struct FMovimientoEnemigo{
 	FDatosCasillas CasillaAnterior;
 
 	UPROPERTY()
-	AZona* Zona;
+	AZona* ZonaPerteneciente;
+
+	bool operator == (const FMovimientoEnemigo& Item) const
+	{
+		return this->CantidadRecorrida == Item.CantidadRecorrida
+			&& this->DistanciaAlObjetivo == Item.DistanciaAlObjetivo
+			&& this->CosteMovimiento == Item.CosteMovimiento
+			&& this->CasillaActual == Item.CasillaActual
+			&& this->CasillaAnterior == Item.CasillaAnterior
+			&& this->ZonaPerteneciente == Item.ZonaPerteneciente;
+	}
 
 	FMovimientoEnemigo()
 		:CantidadRecorrida()
@@ -37,7 +47,17 @@ struct FMovimientoEnemigo{
 		, CosteMovimiento()
 		, CasillaActual(FDatosCasillas())
 		, CasillaAnterior(FDatosCasillas())
-		, Zona()
+		, ZonaPerteneciente()
+	{
+	}
+
+	FMovimientoEnemigo(int CantiadRecorrida, int DistanciaAlObjetivo , int CosteMovimiento , FDatosCasillas CasillaActual , FDatosCasillas CasillaAnterior, AZona* ZonaPerteneciente)
+		:CantidadRecorrida(CantidadRecorrida)
+		, DistanciaAlObjetivo(DistanciaAlObjetivo)
+		, CosteMovimiento(CosteMovimiento)
+		, CasillaActual(CasillaActual)
+		, CasillaAnterior(CasillaAnterior)
+		, ZonaPerteneciente(ZonaPerteneciente)
 	{
 	}
 };

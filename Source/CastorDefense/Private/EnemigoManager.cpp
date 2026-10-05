@@ -16,6 +16,7 @@
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Math/NumericLimits.h"
 #include "Engine/Engine.h"
 
 void UEnemigoManager::OnWorldBeginPlay(UWorld& InWorld)
@@ -66,13 +67,143 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 
 TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D CoordenadasObjetivo, AZona* ZonaSpawn, FDatosCasillas DatosCasillaActual)
 {
-
-	//FALTA STRUCT
+	TMap<FDatosCasillas,FDatosCasillas>CaminoFin;
+	
+	
 	TArray<FMovimientoEnemigo> CaminosPosibles;
+	CaminosPosibles.Add(FMovimientoEnemigo(0, 0, 0, DatosCasillaActual, DatosCasillaActual, ZonaSpawn));
+	FMovimientoEnemigo STConFMenor (0,0,0,DatosCasillaActual,FDatosCasillas(),ZonaSpawn);
 	
 	
+	while (
+		FVector2D(
+			FVector2D(STConFMenor.CasillaActual.GridPosition * MundoManager->GetTamanyoCasilla() + FVector2D(STConFMenor.ZonaPerteneciente->GetActorLocation().Y, STConFMenor.ZonaPerteneciente->GetActorLocation().X)).Y,
+			FVector2D(STConFMenor.CasillaActual.GridPosition * MundoManager->GetTamanyoCasilla() + FVector2D(STConFMenor.ZonaPerteneciente->GetActorLocation().Y, STConFMenor.ZonaPerteneciente->GetActorLocation().X)).X
+		)
+		!=
+		CoordenadasObjetivo
+		&&
+		CaminosPosibles.Num() > 0) {
+
+		for (FMovimientoEnemigo item : CaminosPosibles) {
+
+			FVector2D NuevaCoordenada = item.CasillaActual.GridPosition * MundoManager->GetTamanyoCasilla() + FVector2D(STConFMenor.ZonaPerteneciente->GetActorLocation().Y, STConFMenor.ZonaPerteneciente->GetActorLocation().X);
+
+			
+			item.DistanciaAlObjetivo = FMath::TruncToInt(FMath::Abs(NuevaCoordenada.X - CoordenadasObjetivo.X) + FMath::Abs(NuevaCoordenada.Y - CoordenadasObjetivo.Y));
+			item.CosteMovimiento = (item.CantidadRecorrida + item.DistanciaAlObjetivo);
+
+			if (item.CosteMovimiento < STConFMenor.CosteMovimiento) {
+				STConFMenor = item;
+			}
+		}
+
+		if (!(STConFMenor.CasillaActual.Tipo == ETipoCasilla::Puente && STConFMenor.CasillaAnterior.Tipo == ETipoCasilla::Puente && !CaminoFin.IsEmpty())) {
+		
+			STConFMenor.CantidadRecorrida++;
+		}
+		else {
+			STConFMenor.CantidadRecorrida = STConFMenor.CantidadRecorrida + 3;
+		}
+
+		if (!(STConFMenor.CasillaActual.Tipo == ETipoCasilla::Puente) && !(STConFMenor.CasillaAnterior.Tipo == ETipoCasilla::Puente) || CaminoFin.IsEmpty()) {
+
+			CaminoFin.Add(STConFMenor.CasillaActual, STConFMenor.CasillaAnterior);
+		}
+		else {
+
+			
+			FDatosCasillas PuenteActual(
+				STConFMenor.CasillaAnterior.IndexLocal + 4, 
+				STConFMenor.CasillaAnterior.Tipo,
+				FVector2D(
+					STConFMenor.CasillaAnterior.GridPosition 
+					+ 
+					FVector2D(
+						(
+						FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().Y
+								,STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().X)
+						,FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().Y
+								,STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().X)).GetSafeNormal())),
+						
+				STConFMenor.CasillaAnterior.HIDuenyo, 
+				false, nullptr);
+
+			//SemiPuente 1
+			CaminoFin.Add(PuenteActual, STConFMenor.CasillaAnterior);
+
+			FDatosCasillas PuenteAnterior = PuenteActual;
+
+			PuenteActual.IndexLocal = STConFMenor.CasillaActual.IndexLocal + 4;
+			PuenteActual.Tipo = STConFMenor.CasillaAnterior.Tipo;
+			PuenteActual.GridPosition = FVector2D(STConFMenor.CasillaActual.GridPosition +
+				FVector2D(
+					(FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().Y
+						, STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().X)
+						,
+						FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().Y
+							, STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().X)).GetSafeNormal()));
+										
+			PuenteActual.HIDuenyo = STConFMenor.CasillaActual.HIDuenyo;
+			PuenteActual.PuenteAsociado = nullptr;
+			//SemiPuente2
+			CaminoFin.Add(PuenteActual, PuenteAnterior);
+
+			//Puente2
+			CaminoFin.Add(STConFMenor.CasillaActual, PuenteActual);
+
+		}
+		// Valorar Filtrar por predicado CaminosPosibles.FilterByPredicate()
+
+		for(FMovimientoEnemigo CaminoPosible : CaminosPosibles){
+			if(
+				CaminoPosible.CasillaActual.IndexLocal == STConFMenor.CasillaActual.IndexLocal
+			&& CaminoPosible.CasillaActual.HIDuenyo == STConFMenor.CasillaActual.HIDuenyo
+			){
+				CaminosPosibles.Remove(CaminoPosible);
+				break;
+			}
+		}
+
+		STConFMenor.CosteMovimiento = TNumericLimits<int>::Max();
+
+		TArray<FDatosCasillas> Casillas;
+
+		TMap <FDatosCasillas, AZona*> CasillasConZonas = ComprobarCaminosAdyacentes(STConFMenor.ZonaPerteneciente, STConFMenor.CasillaActual.GridPosition, CaminoFin);
+		CasillasConZonas.GetKeys(Casillas);
+
+		for(FDatosCasillas CasillaActual : Casillas){
+			CaminosPosibles.Add(FMovimientoEnemigo(STConFMenor.CantidadRecorrida, 0, 0, CasillaActual, STConFMenor.CasillaActual, *CasillasConZonas.Find(CasillaActual)));
+			//Actually
+		}
+		
+	}
+
+	bool Fin = true;
+	TMap<FDatosCasillas, FDatosCasillas> DatosCasillaCamino;
+	TArray<FDatosCasillas> Llaves;
+	TArray<FDatosCasillas> RutaARellenar;
+
+	CaminoFin.GetKeys(Llaves);
+	DatosCasillaCamino.Add(Llaves.Last(), CaminoFin[Llaves.Last()]);
+
+	while(Fin){
+		RutaARellenar.Add(Llaves[0]);
+		if(CaminoFin.Find(CaminoFin[Llaves[0]])){
+			DatosCasillaCamino.Add(CaminoFin[Llaves[0]], *CaminoFin.Find(CaminoFin[Llaves[0]]));
+			DatosCasillaCamino.Remove(Llaves[0]);
+
+			TArray<FDatosCasillas> LlavesDatosCasillas;
+			DatosCasillaCamino.GetKeys(LlavesDatosCasillas);
+
+			if(DatosCasillaCamino.Find(LlavesDatosCasillas[0])){
+				Fin = false;
+				//Actually
+			}
+		}
+	}
 	
-	return TArray<FDatosCasillas>();
+	return RutaARellenar;
 }
 
 TMap<FDatosCasillas, AZona*> UEnemigoManager::ComprobarCaminosAdyacentes(AZona* Zona, FVector2D Posicion, TMap<FDatosCasillas, FDatosCasillas> CaminoFinal)
