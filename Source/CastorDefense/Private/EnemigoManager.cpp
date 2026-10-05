@@ -98,17 +98,11 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 			}
 		}
 
-		if (!(STConFMenor.CasillaActual.Tipo == ETipoCasilla::Puente && STConFMenor.CasillaAnterior.Tipo == ETipoCasilla::Puente && !CaminoFin.IsEmpty())) {
-		
-			STConFMenor.CantidadRecorrida++;
-		}
-		else {
-			STConFMenor.CantidadRecorrida = STConFMenor.CantidadRecorrida + 3;
-		}
 
 		if (!(STConFMenor.CasillaActual.Tipo == ETipoCasilla::Puente) && !(STConFMenor.CasillaAnterior.Tipo == ETipoCasilla::Puente) || CaminoFin.IsEmpty()) {
 
 			CaminoFin.Add(STConFMenor.CasillaActual, STConFMenor.CasillaAnterior);
+			STConFMenor.CantidadRecorrida++;
 		}
 		else {
 
@@ -152,6 +146,7 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 			//Puente2
 			CaminoFin.Add(STConFMenor.CasillaActual, PuenteActual);
 
+			STConFMenor.CantidadRecorrida = STConFMenor.CantidadRecorrida + 3;
 		}
 		// Valorar Filtrar por predicado CaminosPosibles.FilterByPredicate()
 
