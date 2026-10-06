@@ -7,7 +7,8 @@
 #include "Nucleo.h"
 #include "Enemigo.h"
 #include "Zona.h"
-
+#include "AIEnemigoController.h"
+ 
 #include "ClaseDeUtilidades.h"
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"
 #include "TiposDeDatosComunes/Struct/FMovimientoEnemigo.h"
@@ -325,6 +326,10 @@ TArray<AEnemigo*> UEnemigoManager::GenerarEnemigosInicioPartida()
 				FTransform(FRotator::ZeroRotator, FVector(0, 0, -10000), FVector(1, 1, 1))
 
 			);
+
+			//CHAPUCERO??
+			AAIEnemigoController* AIEnemigo = Cast<AAIEnemigoController>(Enemigo->GetController());
+			AIEnemigo->SetMundoManager(MundoManager);
 
 			EnemigosGenerados.Add(Enemigo);
 			//FALTA CAMBIAR ESTE METODO A GLOBAL

@@ -15,7 +15,6 @@ void UZonaManager::OnWorldBeginPlay(UWorld& InWorld)
 
     MundoManager = InWorld.GetSubsystem<UMundoManager>();
 
-
 }
 
 
