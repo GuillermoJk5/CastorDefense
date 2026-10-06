@@ -28,6 +28,15 @@ protected:
 	UPROPERTY()
 	float CosteDeEnergia;
 
+	UPROPERTY()
+	ANucleo* Nucleo;
+
+	UPROPERTY()
+	bool Activada;
+
+	UPROPERTY()
+	ETipoCasilla CasillaValida;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -65,16 +74,5 @@ public:
 
 	UFUNCTION()
 	void CalcularEnergiaYActuvar();
-
-private:
-	
-	UPROPERTY()
-	ANucleo* Nucleo;
-
-	UPROPERTY()
-	bool Activada;
-
-	UPROPERTY()
-	ETipoCasilla CasillaValida;
 
 };

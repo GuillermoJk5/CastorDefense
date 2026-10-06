@@ -16,16 +16,9 @@ class CASTORDEFENSE_API AGenerador : public AObjetoColocable
 {
 	GENERATED_BODY()
 
-public:
-
-	virtual void Interactuar() override;
-
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UActorComponent> GeneradorMunicion;
 
 };
