@@ -5,6 +5,7 @@
 #include "Torreta.h"
 #include "Enemigo.h"
 #include "Bala.h"
+#include "CajaMunicion.h"
 
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
@@ -136,8 +137,17 @@ void UCargadorTorretas::DispararBala()
 	}
 }
 
-void UCargadorTorretas::Recargar(/*FALTA TipoMunicion*/) {
-
+void UCargadorTorretas::Recargar(TArray<ACajaMunicion*> CajasMunicion) {
+	if (Municion != CapacidadMax) {
+		for (ACajaMunicion* CajaMunicion : CajasMunicion) {
+			if (!CajaMunicion) continue;
+			if (TipoMunicionPermitida != CajaMunicion->GetTipoMunicion()) continue;
+			Municion = CapacidadMax;
+			IndexBalas = 0;
+			//FALTA Personaje 
+			return;
+		}
+	}
 }
 
 

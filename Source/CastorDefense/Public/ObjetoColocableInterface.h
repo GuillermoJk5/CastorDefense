@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "ObjetoColocableInterface.generated.h"
 
+class ACajaMunicion;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UObjetoColocableInterface : public UInterface
@@ -25,6 +26,6 @@ public:
 
 	virtual void Interactuar() {}
 
-	virtual void Recargar(/*FALTA Caja de municion*/) {}
+	virtual void Recargar(TArray<ACajaMunicion*> Municion) {}
 
 };

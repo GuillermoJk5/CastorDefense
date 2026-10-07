@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TiposDeDatosComunes/Enum/TipoMunicion.h"	
 #include "CargadorTorretas.generated.h"
 
 class ABala;
@@ -50,10 +51,10 @@ public:
 	bool DisparoUtil();
 
 	UFUNCTION()
-	void DispararBala(ATorreta* Torreta);
+	void DispararBala();
 
 	UFUNCTION()
-	void Recargar(/*FALTA TipoMunicion*/);
+	void Recargar(TArray<ACajaMunicion*> Municion);
 
 protected:
 	// Called when the game starts
@@ -77,7 +78,6 @@ private:
 	UPROPERTY()
 	int IndexBalas = 0;
 
-	/*FALTA TipoMunicionPermitida
-		UPROPERTY()
-		Enum TipoMunicionPermitida = Balas;*/
+	UPROPERTY()
+	ETipoMunicion TipoMunicionPermitida = ETipoMunicion::Balas;
 };
