@@ -2,6 +2,14 @@
 
 
 #include "CargadorTorretas.h"
+#include "Torreta.h"
+#include "Enemigo.h"
+#include "Bala.h"
+
+#include "Components/SphereComponent.h"
+#include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
 UCargadorTorretas::UCargadorTorretas()
@@ -55,7 +63,77 @@ void UCargadorTorretas::SetIndexBalas(int InIndexBalas)
 
 void UCargadorTorretas::Disparo()
 {
+	if (Municion > 0) {
+		if (DisparoUtil()) {
+			DispararBala();
+		}
+		else {
+			ATorreta* Torreta = Cast<ATorreta>(GetOwner());
+			Torreta->ObjetivoSaldraDeArea();
+		}
+	}
+}
 
+bool UCargadorTorretas::DisparoUtil()
+{
+	ATorreta* TorretaPerteneciente = Cast<ATorreta>(GetOwner());
+	TArray<AActor*> PosiblesTorretasMundo;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATorreta::StaticClass(), PosiblesTorretasMundo);
+
+	TArray<ATorreta*> RestoTorretasMundo;
+
+	for (AActor* PosibleTorreta : PosiblesTorretasMundo) {
+		if (Cast<ATorreta>(PosibleTorreta) && Cast<ATorreta>(PosibleTorreta) != TorretaPerteneciente) RestoTorretasMundo.Add(Cast<ATorreta>(PosibleTorreta));
+	}
+
+	if (RestoTorretasMundo.IsEmpty()) return true;
+	
+	float VidaEnemigo = TorretaPerteneciente->GetObjetivo()->GetVida();
+	for (ATorreta* Torreta : RestoTorretasMundo) {
+		if (!Torreta->GetActivada()) continue;
+		if (Torreta->GetObjetivo() != TorretaPerteneciente->GetObjetivo()) continue;
+		if (!Torreta->GetTiempoProximoDisparo().IsValid()) continue;
+		if (!(GetWorld()->GetTimerManager().GetTimerRemaining(Torreta->GetTiempoProximoDisparo()) > GetWorld()->GetTimerManager().GetTimerRemaining(TorretaPerteneciente->GetTiempoProximoDisparo()))) continue;
+		if (!(Torreta->GetCargadorTorreta()->GetMunicion() > 0)) continue;
+		if (VidaEnemigo <= (Torreta->GetCargadorTorreta()->GetBalas()[Torreta->GetCargadorTorreta()->GetIndexBalas()]->GetDanyo())) {
+			return false;
+		}
+		else {
+			VidaEnemigo -= Torreta->GetCargadorTorreta()->GetBalas()[Torreta->GetCargadorTorreta()->GetIndexBalas()]->GetDanyo();
+		}
+	}
+
+	return true;
+}
+
+void UCargadorTorretas::DispararBala()
+{
+	ATorreta* Torreta = Cast<ATorreta>(GetOwner());
+	float VelocidadProyectil = 1000.f;
+	float TiempoObjetivo = FVector::Dist(Torreta->GetActorLocation(), Torreta->GetObjetivo()->GetActorLocation()) / VelocidadProyectil;
+
+	const float Tolerancia = 0.05f;
+	FVector PosicionFinal;
+	float Distancia;
+	for (int Index = 0; Index < 20; Index++) {
+		PosicionFinal = Torreta->GetObjetivo()->PredecirMovimiento(TiempoObjetivo);
+		Distancia = FVector::Dist(Torreta->GetActorLocation(), PosicionFinal);
+
+		if (FMath::Abs(Distancia / VelocidadProyectil - TiempoObjetivo) < Tolerancia) {
+			break;
+		}
+		else {
+			TiempoObjetivo = Distancia / VelocidadProyectil;
+		}
+	}
+	if (Torreta->GetAreaRango()->GetScaledSphereRadius() > FVector::Dist(Torreta->GetAreaRango()->GetComponentLocation(), PosicionFinal)) {
+		Balas[IndexBalas]->ActivarBala(Torreta->GetActorLocation(), UKismetMathLibrary::FindLookAtRotation(Torreta->GetActorLocation(), PosicionFinal));
+		Municion--;
+	}
+	else {
+		Torreta->ObjetivoSaldraDeArea();
+	}
 }
 
 void UCargadorTorretas::Recargar(/*FALTA TipoMunicion*/) {

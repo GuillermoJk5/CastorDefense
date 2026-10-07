@@ -7,6 +7,7 @@
 #include "CargadorTorretas.generated.h"
 
 class ABala;
+class ATorreta;
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -46,6 +47,12 @@ public:
 	void Disparo();
 
 	UFUNCTION()
+	bool DisparoUtil();
+
+	UFUNCTION()
+	void DispararBala(ATorreta* Torreta);
+
+	UFUNCTION()
 	void Recargar(/*FALTA TipoMunicion*/);
 
 protected:
@@ -59,18 +66,18 @@ public:
 private:
 
 	UPROPERTY()
-	int CapacidadMax;
+	int CapacidadMax = 10;
 
 	UPROPERTY()
-	int Municion;
+	int Municion = 20;
 		
 	UPROPERTY()
 	TArray<ABala*> Balas;
 
 	UPROPERTY()
-	int IndexBalas;
+	int IndexBalas = 0;
 
 	/*FALTA TipoMunicionPermitida
 		UPROPERTY()
-		int IndexBalas;*/
+		Enum TipoMunicionPermitida = Balas;*/
 };

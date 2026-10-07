@@ -53,6 +53,12 @@ public:
 	UFUNCTION(Category = "Setter")
 	void SetAreaRango(USphereComponent* InAreaRango);
 
+	UFUNCTION(Category = "Getter")
+	FTimerHandle GetTiempoProximoDisparo();
+
+	UFUNCTION(Category = "Setter")
+	void SetTiempoProximoDisparo(FTimerHandle InTiempoProximoDisparo);
+
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

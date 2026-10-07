@@ -35,6 +35,16 @@ void ABala::SetTorreta(ATorreta* InTorreta)
 	this->Torreta = InTorreta;
 }
 
+float ABala::GetDanyo()
+{
+	return this->Danyo;
+}
+
+void ABala::SetDanyo(float InDanyo)
+{
+	this->Danyo = InDanyo;
+}
+
 void ABala::ActivarBala(FVector Posicion, FRotator Rotacion)
 {
 	this->SetActorLocationAndRotation(Posicion,Rotacion,false,nullptr,ETeleportType ::TeleportPhysics );

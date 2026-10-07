@@ -18,11 +18,17 @@ public:
 	// Sets default values for this actor's properties
 	ABala();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Getter")
 	ATorreta* GetTorreta();
 
-	UFUNCTION()
+	UFUNCTION(Category = "Setter")
 	void SetTorreta(ATorreta* InTorreta);
+
+	UFUNCTION(Category = "Getter")
+	float GetDanyo();
+
+	UFUNCTION(Category = "Setter")
+	void SetDanyo(float InDanyo);
 
 	UFUNCTION()
 	void ActivarBala(FVector Posicion,FRotator Rotacion);
