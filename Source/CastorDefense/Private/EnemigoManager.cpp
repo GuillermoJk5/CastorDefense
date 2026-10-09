@@ -8,6 +8,7 @@
 #include "Enemigo.h"
 #include "Zona.h"
 #include "AIEnemigoController.h"
+#include "ClaseDeUtilidades.h"
  
 #include "ClaseDeUtilidades.h"
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"
@@ -332,7 +333,7 @@ TArray<AEnemigo*> UEnemigoManager::GenerarEnemigosInicioPartida()
 			AIEnemigo->SetMundoManager(MundoManager);
 
 			EnemigosGenerados.Add(Enemigo);
-			//FALTA CAMBIAR ESTE METODO A GLOBAL
+		
 			DesActivarEnemigo(Enemigo,false);
 
 		} 
@@ -347,28 +348,23 @@ void UEnemigoManager::DesActivarEnemigo(AEnemigo* Enemigo, bool Activar)
 {
 
 	if (Activar) {
-	
-		Enemigo->SetActorHiddenInGame(false);
+
+		UClaseDeUtilidades::ActivarDesactivarActor(Enemigo, Activar);
+
 		Enemigo->GetMesh()->Activate();
 		Enemigo->GetCharacterMovement()->Activate();
-		Enemigo->SetActorEnableCollision(true);
-		Enemigo->SetActorTickEnabled(true);
-		
+	
 		if (Cast<AEnemigo>(Enemigo)) {
-		//Falta IAMANAGER
-		//Cast<IAManager>(Enemigo->GetOwner())
-		//	IAManager->Avanzar();
+		
+			AAIEnemigoController* AI =Cast<AAIEnemigoController>(Enemigo->GetOwner());
+			AI->Avanzar();
 		}
-
 
 	}
 	else {
-
-		Enemigo->SetActorTickEnabled(false);
-		Enemigo->SetActorEnableCollision(false);
+		UClaseDeUtilidades::ActivarDesactivarActor(Enemigo, Activar);
 		Enemigo->GetCharacterMovement()->Deactivate();
 		Enemigo->GetMesh()->Deactivate();
-		Enemigo->SetActorHiddenInGame(true);
 	}
 }
 

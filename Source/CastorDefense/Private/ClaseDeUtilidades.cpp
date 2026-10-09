@@ -85,3 +85,22 @@ TArray<TSubclassOf<AActor>> UClaseDeUtilidades::ObtenerTodasLasClasesHijas(
 
     return Result;
 }
+
+void UClaseDeUtilidades::ActivarDesactivarActor(AActor* Actor,bool Activar)
+{
+    if (Activar) {
+
+        Actor->SetActorHiddenInGame(false);
+        Actor->SetActorEnableCollision(true);
+        Actor->SetActorTickEnabled(true);
+
+    }
+    else {
+
+        Actor->SetActorTickEnabled(false);
+        Actor->SetActorEnableCollision(false);
+        Actor->SetActorHiddenInGame(true);
+    }
+
+
+}

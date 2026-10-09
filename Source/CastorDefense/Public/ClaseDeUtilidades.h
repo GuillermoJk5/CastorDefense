@@ -17,4 +17,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Class Utilities")
     static TArray<TSubclassOf<AActor>> ObtenerTodasLasClasesHijas(TSubclassOf<AActor> ClasePadre);
+
+	UFUNCTION()
+	static void ActivarDesactivarActor(AActor* Actor,bool Activar);
 };

@@ -4,6 +4,7 @@
 #include "Bala.h"
 #include "Torreta.h"
 #include "Enemigo.h"
+#include "ClaseDeUtilidades.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -63,7 +64,8 @@ void ABala::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	if (Enemigo) {
 
 		Enemigo->RecibirHerida(Danyo);
-		//DESACTIVAR METODO GLOBAL
+		
+		UClaseDeUtilidades :: ActivarDesactivarActor(this, false);
 	
 	}
 			
