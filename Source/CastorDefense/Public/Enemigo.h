@@ -3,6 +3,7 @@
 #pragma once
 
 #include "TiposDeDatosComunes/Struct/FDatosCasillas.h"
+#include "TiposDeDatosComunes/Enum/TipoDeLoot.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Enemigo.generated.h"
@@ -59,6 +60,12 @@ public:
 	UFUNCTION(Category = "Setter")
 	void SetRuta(TArray<FDatosCasillas> InRuta);
 
+	UFUNCTION(Category = "Setter")
+	void SetLoot(TArray<ETipoDeLoot> InLoot);
+
+	UFUNCTION(Category = "Getter")
+	TArray<ETipoDeLoot> GetLoot();
+
 	UFUNCTION()
 	FVector PredecirMovimiento(float TiempoOdjetivo);
 
@@ -83,8 +90,8 @@ private:
 	UPROPERTY()
 	TArray<FDatosCasillas> Ruta;
 
-	//UPROPERTY()
-	//TArray<ETipoLoot> Loot;
+	UPROPERTY()
+	TArray<ETipoDeLoot> Loot;
 
 	UPROPERTY()
 	float Danyo;

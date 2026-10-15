@@ -58,11 +58,17 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 	{
 	TArray<FDatosCasillas> Ruta = CalcularCaminoASeguir(FVector2D(Nucleo->GetActorLocation().Y, Nucleo->GetActorLocation().X), Zona, CasillaSpawn);
 	
-	//FALTA NO HARDCODEAR ESTO
-		if (Ruta.Contains(FDatosCasillas(0, ETipoCasilla::Objetivo, FVector2D(5, 5), *MundoManager->GetMapaZonas()[12]->GetHI().Find(ETipoCasilla::Objetivo), false, nullptr))) {
-	
-			PosicionarEnemigo(Ruta, CasillaSpawn, Zona);
-		}
+
+	//Comprueba que la ruta tiene la casilla objetivo
+
+	if (Ruta.ContainsByPredicate([](const FDatosCasillas Elemento) 
+		{
+			return Elemento.Tipo == ETipoCasilla::Objetivo;
+		})
+	)PosicionarEnemigo(Ruta, CasillaSpawn, Zona);
+		
+
+		
 	}
 
 }

@@ -3,6 +3,7 @@
 #include "PinguinoManager.h"
 #include "MundoManager.h" 
 #include "Zona.h"
+#include "ZonaPortal.h"
 #include "ZonaInicial.h"
 #include "Nucleo.h"
 
@@ -38,13 +39,14 @@ void UZonaManager::SetPinguinoManager(UPinguinoManager* InPinguinoManager) {
     this->PinguinoManager = InPinguinoManager;
 }
 
-int UZonaManager::InstanciarCasilla(/*¿StaticMesh?* HIX, */FVector2D PosicionCasilla){
+/* DEPRECATED, esta mejor en MundoManager
+int UZonaManager::InstanciarCasilla(/*¿StaticMesh?* HIX, FVector2D PosicionCasilla) {
     /*
     MundoManager->casilla.AddInstance(PosicionCasilla.Y*(MundoManager->TamanyoCasilla/2),PosicionCasilla.X*(MundoManager->TamanyoCasilla/2))
     
-    */
+    
     return 0;
-}
+}*/
 
 
 FRotator UZonaManager::RotarPuentes(FVector2D PosicionCasilla) {
@@ -128,7 +130,7 @@ AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
         //SPAWN ZONA
         AZona* Zona = GetWorld()->SpawnActorDeferred<AZona>(
 			AZona::StaticClass(),
-            FTransform (FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0)),
+            FTransform (FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 1)),
             nullptr,
 			nullptr,
             ESpawnActorCollisionHandlingMethod::AlwaysSpawn
@@ -144,7 +146,7 @@ AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
 
 				MundoManager->SetEstadosMapaAPintar(TArray<ETipoCasilla>());
 				Zona->SetActorHiddenInGame(true);
-                Zona->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0)));
+                Zona->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 1)));
             }
 			
      
@@ -178,7 +180,7 @@ AZona* UZonaManager::GenerarZonaInicial(FVector2D CoordenadasZona)
             }
         }
     }
-        //Spawn Zona
+        //Spawn ZonaInicial
         AZonaInicial* ZonaInicial = GetWorld()->SpawnActor<AZonaInicial>(
 
         AZonaInicial::StaticClass(),
@@ -217,9 +219,14 @@ AZona* UZonaManager::GenerarZonaPortal(FVector2D CoordenadasZona)
         }
     }
 
-    //FALTA SpawnactorZonaPortal
+    //SpawnactorZonaPortal
+    AZonaPortal* ZonaPortal = GetWorld()->SpawnActor<AZonaPortal>(
 
-    return nullptr;
+        AZonaPortal::StaticClass(),
+        FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.X, CoordenadasZona.Y, 0), FVector(1, 1, 1))
+    );
+
+    return ZonaPortal;
 }
 
 void UZonaManager::HabilitarZonas(AZona* Zona)

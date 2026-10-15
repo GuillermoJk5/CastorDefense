@@ -19,8 +19,21 @@ class CASTORDEFENSE_API AAIEnemigoController : public AAIController
 
 public:
 
-	
+	UFUNCTION()
+	int GetIndex();
 
+	UFUNCTION()
+	TArray<FDatosCasillas> GetCaminoRuta2();
+
+	UFUNCTION()
+	void SetIndex(int InIndex);
+
+	UFUNCTION()
+	void SetCaminoRuta2(TArray<FDatosCasillas> InCaminoRuta);
+
+	UFUNCTION()
+	UMundoManager* GetMundoManager();
+	
 	UFUNCTION()
 	void SetMundoManager(UMundoManager* InMundoManager);
 

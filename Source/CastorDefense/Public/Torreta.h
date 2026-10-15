@@ -70,7 +70,7 @@ public:
 	UFUNCTION()
 	void ObjetivoSaldraDeArea();
 
-	virtual void Recargar(/*FALTA Caja de municion*/) override;
+	virtual void Recargar(TArray<ACajaMunicion*>CajaMunicion);
 
 	UFUNCTION()
 	void Disparar();

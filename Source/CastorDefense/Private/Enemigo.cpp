@@ -3,6 +3,11 @@
 #include "Enemigo.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnemigoManager.h"
+#include "AIEnemigoController.h"
+#include "ClaseDeUtilidades.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "MundoManager.h"
+#include "Loot.h"
 
 
 // Sets default values
@@ -84,12 +89,54 @@ void AEnemigo::SetRuta(TArray<FDatosCasillas> InRuta)
 	this->Ruta = InRuta;
 }
 
-//FALTA AICONTROLLER
+void AEnemigo::SetLoot(TArray<ETipoDeLoot> InLoot)
+{
+	this->Loot = InLoot;
+}
+
+TArray<ETipoDeLoot> AEnemigo::GetLoot()
+{
+	return this->Loot;
+}
+
 FVector AEnemigo :: PredecirMovimiento(float TiempoOdjetivo){
 
-	FVector PosicionActual = this->GetActorLocation();
+	AAIEnemigoController* AI = Cast<AAIEnemigoController>(this->GetOwner());
+	if (AI) {
 
-	//Cast<AIController>(this->GetOwner());
+		FVector PosicionActual = this->GetActorLocation();
+
+		for (int i = AI->GetIndex(); i <= AI->GetCaminoRuta2().Num() - 2 ; i++) {
+	
+			FVector2D PosicionCasilla = (FVector2D(AI->GetCaminoRuta2()[i + 1].GridPosition.Y, AI->GetCaminoRuta2()[i + 1].GridPosition.X) * AI->GetMundoManager()->GetTamanyoCasilla());
+			FVector CoordenadaMatriz = AI->GetCaminoRuta2()[i + 1].HIDuenyo->GetOwner()->GetActorLocation();
+
+			FVector CoordenadaFinal(
+				CoordenadaMatriz.X + PosicionCasilla.X, 
+				CoordenadaMatriz.Y + PosicionCasilla.Y,
+				200);
+
+			if (TiempoOdjetivo <= FVector::Dist(PosicionActual, CoordenadaFinal) / GetCharacterMovement()->MaxWalkSpeed) {
+			
+				return FVector(PosicionActual + FVector2D(FVector2D(CoordenadaFinal) - FVector2D(PosicionActual)).Normalize() * GetCharacterMovement()->MaxWalkSpeed * TiempoOdjetivo);
+			
+			}
+			else {
+
+				TiempoOdjetivo = TiempoOdjetivo - FVector::Dist(PosicionActual, CoordenadaFinal) / GetCharacterMovement()->MaxWalkSpeed;
+
+				if (i == AI->GetCaminoRuta2().Num() - 2) {
+				
+					return CoordenadaFinal;
+				
+				}
+				else {
+				
+					PosicionActual = CoordenadaFinal;
+				}
+			}
+		}
+	}
 
 	return FVector();
 }
@@ -99,10 +146,23 @@ void AEnemigo::RecibirHerida(float Herida)
 	Vida = Vida - Herida;
 	if (Vida <= 0) {
 	
-	//FALTA LOOT
-	//SPAWN LOOT
+		//SPAWN LOOT
+			for(ETipoDeLoot item : this->Loot){
+		
+			ALoot* NLoot = GetWorld()->SpawnActorDeferred<ALoot>(
+				ALoot::StaticClass(),
+				FTransform(),
+				nullptr,
+				nullptr,
+				ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+			);
+			if (NLoot) {
+				NLoot->SetTipoDeLoot(item);
+				NLoot->FinishSpawning(FTransform(FRotator::ZeroRotator, this->GetActorLocation()));
+			}
+		}
 
-	Destruir();
+		Destruir();
 		
 	}
 }
@@ -110,8 +170,7 @@ void AEnemigo::RecibirHerida(float Herida)
 
 void AEnemigo::Destruir()
 {
-	//FALTA DESACTIVARACTOR METODO GLOBAL
-	//DesActivarEnemigo(this, false);
+	UClaseDeUtilidades::ActivarDesactivarActor(this, false);
 
 	this->SetActorLocation(
 		FVector(0, 0, -10000),

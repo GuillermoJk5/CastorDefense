@@ -43,9 +43,10 @@ public:
 	UFUNCTION()
 	void SetPinguinoManager(UPinguinoManager* InPinguinoManager);
 
-	//FALTA HIX
+	/*/HIX
+	Deprecated esta mejor en mundo manager
 	UFUNCTION()
-	int InstanciarCasilla(/*¿StaticMesh?* HIX, */FVector2D PosicionCasilla);
+	int InstanciarCasilla(/*¿StaticMesh?* HIX, FVector2D PosicionCasilla);*/
 
 	UFUNCTION()
 	FRotator RotarPuentes(FVector2D PosicionCasilla);
@@ -53,11 +54,9 @@ public:
 	UFUNCTION()
 	AZona* GenerarZona(FVector2D CoordenadasZona);
 
-	//FALTA ZonaInicial
 	UFUNCTION()
 	AZona* GenerarZonaInicial(FVector2D CoordenadasZona);
 
-	//FALTA ZonaPortal
 	UFUNCTION()
 	AZona* GenerarZonaPortal(FVector2D CoordenadasZona);
 

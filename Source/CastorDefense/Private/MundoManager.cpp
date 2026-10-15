@@ -348,7 +348,7 @@ void UMundoManager::CalcularCantidadCasillasAInstanciar()
             CantidadCasillasPorTipo[DatosCasilla.Tipo].Add(Transform);
         }
     }
-    //FALTA AGREGAR HI
+    
     for (const TPair<ETipoCasilla, TArray<FTransform>>& LLaveValor : CantidadCasillasPorTipo) {
         GuardarEInstanciarCasillas(LLaveValor.Key, LLaveValor.Value);
     }

@@ -9,6 +9,31 @@
 
 
 
+int AAIEnemigoController::GetIndex()
+{
+	return this->Index;
+}
+
+TArray<FDatosCasillas> AAIEnemigoController::GetCaminoRuta2()
+{
+	return this->CaminoRuta2;
+}
+
+void AAIEnemigoController::SetIndex(int InIndex)
+{
+	this->Index = InIndex;
+}
+
+void AAIEnemigoController::SetCaminoRuta2(TArray<FDatosCasillas> InCaminoRuta2)
+{
+	this->CaminoRuta2 = InCaminoRuta2;
+}
+
+UMundoManager* AAIEnemigoController::GetMundoManager()
+{
+	return this->MundoManager;
+}
+
 void AAIEnemigoController::SetMundoManager(UMundoManager* InMundoManager)
 {
 	this->MundoManager = InMundoManager;

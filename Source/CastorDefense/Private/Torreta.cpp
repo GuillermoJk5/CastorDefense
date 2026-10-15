@@ -134,9 +134,9 @@ void ATorreta::ObjetivoSaldraDeArea()
 	}
 }
 
-void ATorreta::Recargar(/*FALTA Caja de municion*/)
+void ATorreta::Recargar(TArray<ACajaMunicion*> CajaMunicion )
 {
-	AC_CargadorTorreta->Recargar();
+	AC_CargadorTorreta->Recargar(CajaMunicion);
 }
 
 void ATorreta::Disparar()

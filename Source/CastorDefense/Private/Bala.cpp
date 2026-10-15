@@ -49,7 +49,8 @@ void ABala::SetDanyo(float InDanyo)
 void ABala::ActivarBala(FVector Posicion, FRotator Rotacion)
 {
 	this->SetActorLocationAndRotation(Posicion,Rotacion,false,nullptr,ETeleportType ::TeleportPhysics );
-	//LLAMAR METDODO GLOBAL ACTIVAR ACTOR
+	
+	UClaseDeUtilidades::ActivarDesactivarActor(this, true);
 
 	ProjectileMovement->Velocity = FVector(ProjectileMovement->MaxSpeed, 0.f, 0.f);
 	ProjectileMovement->Activate();
@@ -87,8 +88,7 @@ void ABala::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (!this->IsHidden() && FVector::Dist(Torreta->GetActorLocation(), this->GetActorLocation()) > Torreta->GetAreaDeteccion()->GetScaledSphereRadius()) {
 
-		//DESACTIVAR  ACTOR METODO GLOBAL
-
+		UClaseDeUtilidades::ActivarDesactivarActor(this, false);
 
 	}
 
