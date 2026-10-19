@@ -232,6 +232,34 @@ AZona* UMundoManager::GenerarEsquinaMundo(int index)
     return Zona;
 }
 
+void UMundoManager::ObtenerCasillaParaColocar(FVector LocalizacionPlayer, FDatosCasillas& Casilla, FVector2D& CoordenadasCasilla)
+{
+    //Comprobamos en que Zona esta el Player
+    for (AZona* item :MapaZonas) {
+        if (LocalizacionPlayer.X > item->GetActorLocation().X - TamanyoCasilla && LocalizacionPlayer.X < item->GetActorLocation().X - TamanyoCasilla + 2600 &&
+            LocalizacionPlayer.Y > item->GetActorLocation().Y - TamanyoCasilla && LocalizacionPlayer.Y < item->GetActorLocation().Y - TamanyoCasilla + 2600)
+        {
+            //Comprobamos en que Casilla esta el Player
+            for (FDatosCasillas datos : item->GetDatosCasillas()) {
+            
+                CoordenadasCasilla = FVector2D(item->GetActorLocation().X, item->GetActorLocation().Y) + FVector2D(datos.GridPosition.Y * TamanyoCasilla, datos.GridPosition.X * TamanyoCasilla);
+
+                if(LocalizacionPlayer.X > CoordenadasCasilla.X - TamanyoCasilla/2 && LocalizacionPlayer.X < CoordenadasCasilla.X + TamanyoCasilla / 2 &&
+                    LocalizacionPlayer.Y > CoordenadasCasilla.Y - TamanyoCasilla / 2 && LocalizacionPlayer.Y < CoordenadasCasilla.Y + TamanyoCasilla / 2)
+                {
+                    Casilla = datos;
+                    break;
+                }
+            }
+
+            break;
+        }
+
+    }
+    
+   
+}
+
 void UMundoManager::GenerarZonasDesdeInicio()
 {
     TArray<AZona*> ZonasAdyacentes;

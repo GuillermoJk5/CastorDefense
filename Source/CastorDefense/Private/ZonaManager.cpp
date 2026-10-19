@@ -130,7 +130,7 @@ AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
         //SPAWN ZONA
         AZona* Zona = GetWorld()->SpawnActorDeferred<AZona>(
 			AZona::StaticClass(),
-            FTransform (FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 1)),
+            FTransform (FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0)),
             nullptr,
 			nullptr,
             ESpawnActorCollisionHandlingMethod::AlwaysSpawn
@@ -146,7 +146,7 @@ AZona* UZonaManager::GenerarZona(FVector2D CoordenadasZona)
 
 				MundoManager->SetEstadosMapaAPintar(TArray<ETipoCasilla>());
 				Zona->SetActorHiddenInGame(true);
-                Zona->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 1)));
+                Zona->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0)));
             }
 			
      

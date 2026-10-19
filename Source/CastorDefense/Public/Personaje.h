@@ -2,49 +2,78 @@
 
 #pragma once
 
+#include "TiposDeDatosComunes/Enum/TiposColocables.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "Personaje.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
-class UInputMappingContext;
+
 class UInputAction;
+class UPersonajeInput;
+class UMundoManager;
+class ACajaMunicion;
 struct FInputActionValue;
+struct FInputActionInstance;
+
+
 
 UCLASS()
 class CASTORDEFENSE_API APersonaje : public ACharacter
 {
 	GENERATED_BODY()
 
-	/** Brazo de cámara */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
-
-	/** Cámara de seguimiento */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
-
-	/** Contexto de Mapeo (Configurado en el Editor) */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
-
-	/** Acción de Mover */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
-
-	/** Acción de Mirar */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* LookAction;
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UPersonajeInput* PersonajeInput;
+
+	UFUNCTION(Category="Getter")
+	UMundoManager* GetMundoManager();
+
+	UFUNCTION(Category = "Getter")
+	TArray<ACajaMunicion*> GetInventarioCinturon();
+
+	UFUNCTION(Category = "Getter")
+	float GetTimer();
+
+	UFUNCTION(Category = "Setter")
+	void SetTimer(float inTimer);
+
+	UFUNCTION(Category = "Setter")
+	void SetInventarioCinturon(TArray<ACajaMunicion*> InInventarioCinturon);
+
+	UFUNCTION(Category = "Setter")
+	void SetMundoManager(UMundoManager* InMundoManager);
+
+	// Handlers para las acciones
+	void Colocar(ETiposColocables Tipo);
+	void ColocarTorreta();
+	void ColocarGenerador();
+	void Interactuar(const FInputActionValue& Value);
+	void Movimiento(const FInputActionValue& Value);
+	void OnRecargarTriggered(const FInputActionInstance& Instance);
+	void OnRecargarCanceled();
+	void OnRecargarCompleted();
+	void DebugOleada(const FInputActionValue& Value);
+
+	
+
 	// Sets default values for this character's properties
 	APersonaje();
 
 protected:
-	// Called when the game starts or when spawned
+
 	UFUNCTION()
+	void ConsumirMunicion(ACajaMunicion* CajaMunicion);
+
+	UFUNCTION()
+	void OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 public:	
 	// Called every frame
@@ -53,4 +82,18 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private: 
+	UPROPERTY()
+	UMundoManager* MundoManager;
+
+	UPROPERTY()
+	TArray<ACajaMunicion*> InventarioCinturon;
+
+	//FALTA INTEFAZ
+	// 
+	//UPROPERTY()
+	//Interfaz* Interfaz;
+
+	UPROPERTY()
+	float Timer = 0.f;
 };

@@ -27,7 +27,7 @@ struct FDatosCasillas
 	UHierarchicalInstancedStaticMeshComponent* HIDuenyo;
 
 	UPROPERTY()
-	bool Torreta;
+	bool Ocupada;
 
 	UPROPERTY()
 	APuente* PuenteAsociado;
@@ -38,7 +38,7 @@ struct FDatosCasillas
 			&& Tipo == Other.Tipo
 			&& GridPosition == Other.GridPosition
 			&& HIDuenyo == Other.HIDuenyo
-			&& Torreta == Other.Torreta
+			&& Ocupada == Other.Ocupada
 			&& PuenteAsociado == Other.PuenteAsociado;
 	}
 
@@ -47,27 +47,27 @@ struct FDatosCasillas
 		, Tipo()
 		, GridPosition(0.f, 0.f)
 		, HIDuenyo()
-		, Torreta()
+		, Ocupada()
 		, PuenteAsociado()
 	{
 	}
 
-	FDatosCasillas(ETipoCasilla Tipo, FVector2D GridPosition,bool Torreta, APuente* PuenteAsociado)
+	FDatosCasillas(ETipoCasilla Tipo, FVector2D GridPosition,bool Ocupada, APuente* PuenteAsociado)
 		:IndexLocal()
 		, Tipo(Tipo)
 		, GridPosition(GridPosition)
 		, HIDuenyo()
-		, Torreta(Torreta)
+		, Ocupada(Ocupada)
 		, PuenteAsociado(PuenteAsociado)
 	{
 	}
 
-	FDatosCasillas(int IndexLocal, ETipoCasilla Tipo, FVector2D GridPosition, UHierarchicalInstancedStaticMeshComponent* HIDuenyo, bool Torreta, APuente* PuenteAsociado)
+	FDatosCasillas(int IndexLocal, ETipoCasilla Tipo, FVector2D GridPosition, UHierarchicalInstancedStaticMeshComponent* HIDuenyo, bool Ocupada, APuente* PuenteAsociado)
 		:IndexLocal(IndexLocal)
 		, Tipo(Tipo)
 		, GridPosition(GridPosition)
 		, HIDuenyo(HIDuenyo)
-		, Torreta(Torreta)
+		, Ocupada(Ocupada)
 		, PuenteAsociado(PuenteAsociado)
 	{
 	}
@@ -82,7 +82,7 @@ FORCEINLINE uint32 GetTypeHash(const FDatosCasillas& Key)
 	Hash = HashCombine(Hash, GetTypeHash(Key.Tipo));
 	Hash = HashCombine(Hash, GetTypeHash(Key.GridPosition));
 	Hash = HashCombine(Hash, GetTypeHash(Key.HIDuenyo));
-	Hash = HashCombine(Hash, GetTypeHash(Key.Torreta));
+	Hash = HashCombine(Hash, GetTypeHash(Key.Ocupada));
 	Hash = HashCombine(Hash, GetTypeHash(Key.PuenteAsociado));
 	return Hash;
 }

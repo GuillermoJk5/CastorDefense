@@ -9,9 +9,12 @@
 //Enum TipoCasillas
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
 
+
 //Struck
 #include "TiposDeDatosComunes/Struct/FEstadosMundo.h"
+#include "TiposDeDatosComunes/Struct/FDatosCasillas.h"
 #include "MundoManager.generated.h"
+
 
 class UZonaManager;
 class AZona;
@@ -115,6 +118,9 @@ public:
 
 	UFUNCTION()
 	AZona* GenerarEsquinaMundo(int index);
+
+	UFUNCTION()
+	void ObtenerCasillaParaColocar(FVector LocalizacionPlayer, FDatosCasillas& Casilla, FVector2D& CoordenadasCasilla);
 
 	UFUNCTION()
 	void GenerarZonasDesdeInicio();
