@@ -15,6 +15,8 @@
 #include "DrawDebugHelpers.h"
 
 #include "ObjetoColocable.h"
+#include "ClaseDeUtilidades.h"
+#include "Nucleo.h"
 #include "Puente.h"
 #include "Torreta.h"
 #include "Zona.h"
@@ -23,7 +25,7 @@
 #include "CajaMunicion.h"
 #include "MundoManager.h"
 #include "ZonaManager.h"
-
+#include "OleadasManager.h"
 
 UMundoManager* APersonaje::GetMundoManager()
 {
@@ -69,24 +71,24 @@ void APersonaje::Colocar(ETiposColocables Tipo)
 		
 		case ETiposColocables::Torreta:{
 
-			ATorreta* Torrea = GetWorld()->SpawnActorDeferred<ATorreta>(
+			ATorreta* CajaMunicion = GetWorld()->SpawnActorDeferred<ATorreta>(
 				ATorreta::StaticClass(),
 				FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)),
 				nullptr,
 				nullptr,
 				ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 			);
-			if (Torrea) {
-				if (Torrea->GetCasillaValida() == Casilla.Tipo) {
+			if (CajaMunicion) {
+				if (CajaMunicion->GetCasillaValida() == Casilla.Tipo) {
 
-					Torrea->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)));
+					CajaMunicion->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)));
 
 					int a = MundoManager->GetMapaZonas().Find(Cast<AZona>(Casilla.HIDuenyo->GetOwner()));
 					int b = MundoManager->GetMapaZonas()[a]->GetDatosCasillas().Find(Casilla);
 
 					MundoManager->GetMapaZonas()[a]->GetDatosCasillas()[b].Ocupada = true;
 
-					Torrea->CalcularEnergiaYActuvar();
+					CajaMunicion->CalcularEnergiaYActuvar();
 				}
 			}
 
@@ -129,8 +131,8 @@ void APersonaje::Interactuar(const FInputActionValue& Value)
 	FCollisionShape MyCapsule = FCollisionShape::MakeCapsule(Radius, HalfHeight);
 
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // Evita que la cápsula se choque con el ejecutor
-	QueryParams.bTraceComplex = false; // Falso para usar colisión simple (mejor rendimiento)
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.bTraceComplex = false;
 
 	
 	FHitResult HitResult;
@@ -138,8 +140,8 @@ void APersonaje::Interactuar(const FInputActionValue& Value)
 		HitResult,
 		StartLocation,
 		EndLocation,
-		FQuat::Identity,           // Rotación de la cápsula (usualmente la del Actor)
-		ECC_Visibility,            // Canal de colisión
+		FQuat::Identity,           
+		ECC_Visibility,            
 		MyCapsule,
 		QueryParams
 	);
@@ -154,23 +156,19 @@ void APersonaje::Interactuar(const FInputActionValue& Value)
 	if (bHit) {
 		AActor* ActorGolpeado = HitResult.GetActor();
 		if (ActorGolpeado) {
-			if (Cast<AObjetoColocable>(ActorGolpeado))
-			{
-				AObjetoColocable* ObjetoColocable = Cast<AObjetoColocable>(ActorGolpeado);
+			if (AObjetoColocable* ObjetoColocable =Cast<AObjetoColocable>(ActorGolpeado))
+			{ 
 				ObjetoColocable->Interactuar();
 			}
-			else if (Cast<APuente>(ActorGolpeado))
+			else if (APuente* Puente = Cast<APuente>(ActorGolpeado))
 			{
-				APuente* Puente = Cast<APuente>(ActorGolpeado);
 				if (!Puente->GetBajado())
 				{
 					MundoManager->GetZonaManager()->HabilitarZonas(Puente->GetConectadoCon());
 					FTimerHandle TiempoDeEspera;
 					GetWorldTimerManager().SetTimer(TiempoDeEspera, [this]()
 					{
-
-						//FALTA GESTOR OLEADAS
-						//MundoManager->GetGestorOleadas()->JGO();
+						MundoManager->GetOleadasManager()->JGO();
 					}, 5.f, false);
 				}
 			}
@@ -201,8 +199,8 @@ void APersonaje::OnRecargarTriggered(const FInputActionInstance& Instance)
 
 	
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // Evita que la cápsula se choque con el ejecutor
-	QueryParams.bTraceComplex = false; // Falso para usar colisión simple (mejor rendimiento)
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.bTraceComplex = false; 
 
 	
 	FHitResult HitResult;
@@ -210,8 +208,8 @@ void APersonaje::OnRecargarTriggered(const FInputActionInstance& Instance)
 		HitResult,
 		StartLocation,
 		EndLocation,
-		FQuat::Identity,           // Rotación de la cápsula (usualmente la del Actor)
-		ECC_Visibility,            // Canal de colisión
+		FQuat::Identity,           
+		ECC_Visibility,            
 		MyCapsule,
 		QueryParams
 	);
@@ -226,11 +224,11 @@ void APersonaje::OnRecargarTriggered(const FInputActionInstance& Instance)
 	{
 		AActor* ActorGolpeado = HitResult.GetActor();
 		if (ActorGolpeado) {
-			if (Cast<ATorreta>(ActorGolpeado))
+			if (ATorreta* Torreta =Cast<ATorreta>(ActorGolpeado))
 			{
-				ATorreta* Ocupada = Cast<ATorreta>(ActorGolpeado);
+				
 				if (Instance.GetTriggeredTime() > Timer) {
-					Ocupada->Recargar(InventarioCinturon);
+					Torreta->Recargar(InventarioCinturon);
 					Timer = Instance.GetTriggeredTime() + 2.f;
 				}
 			}
@@ -254,8 +252,7 @@ void APersonaje::OnRecargarCompleted()
 
 void APersonaje::DebugOleada(const FInputActionValue& Value)
 {
-	//FALTA GESTOR OLEADAS
-	//MundoManager->GetGestorOleadas()->JGO();
+	MundoManager->GetOleadasManager()->JGO();
 }
 
 // Sets default values
@@ -268,9 +265,11 @@ APersonaje::APersonaje()
 
 void APersonaje::ConsumirMunicion(ACajaMunicion* CajaMunicion)
 {
+	ANucleo* Nucleo = Cast<ANucleo>(UGameplayStatics::GetActorOfClass(GetWorld(), ANucleo::StaticClass()));
+	
+	Nucleo->GetMunicionCreada().Add(InventarioCinturon[InventarioCinturon.Find(CajaMunicion)]);
 
-		/*SET AC GENERADOR MUNICION -> MUNICION CREADA*/	InventarioCinturon[InventarioCinturon.Find(CajaMunicion)];
-		InventarioCinturon[InventarioCinturon.Find(CajaMunicion)] = nullptr;
+	InventarioCinturon[InventarioCinturon.Find(CajaMunicion)] = nullptr;
 		
 		//FALTA
 		//INTERFAZ ACTUALIZAR INVENTARIO
@@ -280,8 +279,8 @@ void APersonaje::ConsumirMunicion(ACajaMunicion* CajaMunicion)
 
 void APersonaje::OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	ACajaMunicion* CajaMuni = Cast<ACajaMunicion>(OtherActor);
-	if (CajaMuni) {
+	
+	if (ACajaMunicion* CajaMuni = Cast<ACajaMunicion>(OtherActor)) {
 		int index=0;
 		for(ACajaMunicion* item : InventarioCinturon){
 		
@@ -296,12 +295,10 @@ void APersonaje::OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 		//FALTA
 		//INTERFAZ ACTUALIZAR INVENTARIO
 
+		UClaseDeUtilidades::ActivarDesactivarActor(CajaMuni, false);
 		CajaMuni->SetActorLocation(FVector(0, 0, -1000));
 
-	}
-
-	ALoot* NuevoLoot = Cast<ALoot>(OtherActor);
-	if (NuevoLoot) {
+	}else if (ALoot* NuevoLoot = Cast<ALoot>(OtherActor)) {
 
 		//FALTAA
 		//AGREGAR LOGICA DE INVENTARIO DE LOOT
@@ -325,8 +322,8 @@ void APersonaje::BeginPlay()
 		}
 	}
 
-	AZonaInicial* ZonaInicial = Cast<AZonaInicial>(UGameplayStatics::GetActorOfClass(GetWorld(), AZonaInicial::StaticClass()));
-	if(ZonaInicial){
+	;
+	if(AZonaInicial* ZonaInicial = Cast<AZonaInicial>(UGameplayStatics::GetActorOfClass(GetWorld(), AZonaInicial::StaticClass()))){
 		SetActorLocation(FVector(ZonaInicial->GetActorLocation().X, ZonaInicial->GetActorLocation().Y, ZonaInicial->GetActorLocation().Z + 250.f));
 		InventarioCinturon.SetNum(4);
 	}

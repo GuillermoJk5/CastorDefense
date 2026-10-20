@@ -4,6 +4,7 @@
 #include "MundoManager.h"
 #include "ZonaManager.h"
 #include "Zona.h"
+#include "OleadasManager.h"
 
 //Includes para el NavMesh
 #include "Kismet/GameplayStatics.h"
@@ -11,6 +12,7 @@
 #include "NavigationSystem.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
+#include "Components/StaticMeshComponent.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Algo/Reverse.h"
 
@@ -18,6 +20,10 @@
 void UMundoManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
+
+    FBox BoundingBox = MeshAsset->GetBoundingBox();
+
+    TamanyoCasilla = (BoundingBox.Max.X - BoundingBox.Min.X) * 2;
 
 	ZonaManager = InWorld.GetSubsystem<UZonaManager>();
 
@@ -110,6 +116,16 @@ float UMundoManager::GetTamanyoLadoMundo()
 void UMundoManager::SetTamanyoLadoMundo(int InTamanyoLadoMundo)
 {
     this->TamanyoLadoMundo = InTamanyoLadoMundo;
+}
+
+UOleadasManager* UMundoManager::GetOleadasManager()
+{
+	return this->OleadasManager;
+}
+
+void UMundoManager::SetOleadasManager(UOleadasManager* InOleadasManager)
+{
+	this->OleadasManager = InOleadasManager;
 }
 
 FEstadosMundo UMundoManager::GetEstados()

@@ -9,13 +9,14 @@
 //Enum TipoCasillas
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"	
 
-
 //Struck
 #include "TiposDeDatosComunes/Struct/FEstadosMundo.h"
 #include "TiposDeDatosComunes/Struct/FDatosCasillas.h"
 #include "MundoManager.generated.h"
 
-
+class UStaticMeshComponent;
+class UStaticMesh;
+class UOleadasManager;
 class UZonaManager;
 class AZona;
 
@@ -30,8 +31,10 @@ class CASTORDEFENSE_API UMundoManager : public UWorldSubsystem
 
 public:
 
-	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Geometry")
+	TObjectPtr<UStaticMesh> MeshAsset;
 
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
 	//Getters y Setters
 	UFUNCTION(Category = "Getter")
@@ -63,6 +66,12 @@ public:
 
 	UFUNCTION(Category = "Setter")
 	void SetTamanyoLadoMundo(int InTamanyoLadoMundo);
+
+	UFUNCTION(Category = "Getter")
+	UOleadasManager* GetOleadasManager();
+
+	UFUNCTION(Category = "Setter")
+	void SetOleadasManager(UOleadasManager* InOleadasManager);
 
 	UFUNCTION(Category = "Getter")
 	struct FEstadosMundo GetEstados();
@@ -153,6 +162,9 @@ public:
 
 	}
 
+protected:
+
+
 private:
 
 	UPROPERTY()
@@ -171,20 +183,15 @@ private:
 	int TamanyoLadoMundo;
 
 	UPROPERTY()
+	UOleadasManager* OleadasManager;
+
+	UPROPERTY()
 	struct FEstadosMundo Estados;
 
 	/*
 	UPROPERTY(EditAnywhere)
 	int MeshCasilla
+*/
 	
-	UPROPERTY()
-	int EnemigosManager;
-
-	UPROPERTY()
-	int ActorObjetivo;
-
-	UPROPERTY()
-	int GestorOleadas;
-	*/
 
 };

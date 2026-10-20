@@ -66,9 +66,6 @@ public:
 protected:
 
 	UFUNCTION()
-	void ConsumirMunicion(ACajaMunicion* CajaMunicion);
-
-	UFUNCTION()
 	void OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	// Called when the game starts or when spawned
@@ -81,6 +78,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void ConsumirMunicion(ACajaMunicion* CajaMunicion);
 
 private: 
 	UPROPERTY()

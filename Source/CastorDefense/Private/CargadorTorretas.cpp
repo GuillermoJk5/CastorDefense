@@ -11,6 +11,7 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include <Personaje.h>
 
 // Sets default values for this component's properties
 UCargadorTorretas::UCargadorTorretas()
@@ -144,7 +145,9 @@ void UCargadorTorretas::Recargar(TArray<ACajaMunicion*> CajasMunicion) {
 			if (TipoMunicionPermitida != CajaMunicion->GetTipoMunicion()) continue;
 			Municion = CapacidadMax;
 			IndexBalas = 0;
-			//FALTA Personaje 
+
+			APersonaje* Personaje = Cast<APersonaje>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			Personaje->ConsumirMunicion(CajaMunicion);
 			return;
 		}
 	}

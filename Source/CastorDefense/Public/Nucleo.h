@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "CajaMunicion.h"
 #include "Nucleo.generated.h"
+
 
 UCLASS()
 class CASTORDEFENSE_API ANucleo : public AActor
@@ -33,6 +35,12 @@ public:
 	UFUNCTION(Category = "Setter")
 	void SetEnergiaRestante(float InEnergiaRestante);
 
+	UFUNCTION()
+	TArray<ACajaMunicion*> GetMunicionCreada();
+
+	UFUNCTION()
+	void SetMunicionCreada(TArray<ACajaMunicion*> inCajaMunicion);
+
 	UPROPERTY(VisibleAnywhere, Category = "Collision")
 	class UStaticMeshComponent* CollisionMesh;
 
@@ -45,6 +53,9 @@ public:
 	UFUNCTION()
 	bool ActualizarEnergia(float CosteDeEnergia);
 
+	UFUNCTION()
+	void GenerarMunicion(ETipoMunicion TipoMunicion, ETamanyoMunicion TamanyoMunicion, AActor* Generador/*Falta Icono??*/);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,9 +66,16 @@ public:
 
 private:
 
+	UPROPERTY()
 	float Vida;
 
+	UPROPERTY()
 	float EnergiaMax;
 
+	UPROPERTY()
 	float EnergiaRestante;
+
+	UPROPERTY()
+	TArray<ACajaMunicion*> MunicionCreada;
+
 };
