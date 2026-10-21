@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Puente.h"
+#include "Mapa/Puente.h"
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"
 #include "FDatosCasillas.generated.h"
 
