@@ -31,8 +31,10 @@ class CASTORDEFENSE_API UMundoManager : public UWorldSubsystem
 
 public:
 
+	UMundoManager();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Geometry")
-	TObjectPtr<UStaticMesh> MeshAsset;
+	TObjectPtr<UStaticMesh> MeshCasilla;
 
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
@@ -126,7 +128,10 @@ public:
 	void CrearNavMesh();
 
 	UFUNCTION()
-	AZona* GenerarEsquinaMundo(int index);
+	void Inicio();
+
+	UFUNCTION()
+	void GenerarEsquinasMundo();
 
 	UFUNCTION()
 	void ObtenerCasillaParaColocar(FVector LocalizacionPlayer, FDatosCasillas& Casilla, FVector2D& CoordenadasCasilla);
@@ -164,6 +169,7 @@ public:
 
 protected:
 
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
 private:
 
@@ -187,11 +193,5 @@ private:
 
 	UPROPERTY()
 	struct FEstadosMundo Estados;
-
-	/*
-	UPROPERTY(EditAnywhere)
-	int MeshCasilla
-*/
-	
 
 };

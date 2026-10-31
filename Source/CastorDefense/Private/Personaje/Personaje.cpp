@@ -89,7 +89,7 @@ void APersonaje::Colocar(ETiposColocables Tipo)
 
 					MundoManager->GetMapaZonas()[a]->GetDatosCasillas()[b].Ocupada = true;
 
-					CajaMunicion->CalcularEnergiaYActuvar();
+					CajaMunicion->CalcularEnergiaYActivar();
 				}
 			}
 

@@ -23,6 +23,8 @@ class CASTORDEFENSE_API ATorreta : public AObjetoColocable
 
 public:
 
+	ATorreta();
+
 	UFUNCTION(Category = "Getter")
 	AEnemigo* GetObjetivo();
 
@@ -52,6 +54,7 @@ public:
 
 	UFUNCTION(Category = "Setter")
 	void SetAreaRango(USphereComponent* InAreaRango);
+	
 
 	UFUNCTION(Category = "Getter")
 	FTimerHandle GetTiempoProximoDisparo();
@@ -82,20 +85,20 @@ protected:
 
 private:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Asignables", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* AreaDeteccion;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Asignables", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* AreaRango;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Asignables", meta = (AllowPrivateAccess = "true"))
+	UCargadorTorretas* AC_CargadorTorreta;
 
 	UPROPERTY()
 	AEnemigo* Objetivo;
 
 	UPROPERTY()
 	TArray<AEnemigo*> EnRango;
-
-	UPROPERTY()
-	UCargadorTorretas* AC_CargadorTorreta;
 
 	FTimerHandle TiempoProximoDisparo;
 };

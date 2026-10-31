@@ -5,10 +5,11 @@
 #include "Managers/ZonaManager.h"
 #include "Mapa/Zonas/Zona.h"
 #include "Managers/OleadasManager.h"
+//#include "Managers/EnemigoManager.h"
 
 //Includes para el NavMesh
 #include "Kismet/GameplayStatics.h"
-//#include "NavigationSystemV1.h"
+
 #include "NavigationSystem.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
@@ -17,56 +18,37 @@
 #include "Algo/Reverse.h"
 
 
+UMundoManager::UMundoManager()
+{
+    if (!MeshCasilla) {
+        static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/Mapa/Casillas/SM_Casilla.SM_Casilla"));
+
+        if (MeshAsset.Succeeded())
+        {
+            MeshCasilla = MeshAsset.Object;
+        }
+    }
+    this->TamanyoLadoMundo = 5;
+    this->TamanyoLadoZona = 11;
+    this->Estados.Fin = false;
+    this->Estados.ZBuscarMas = true;
+    this->Estados.TieneQueSerInterseccion = false;
+}
+
 void UMundoManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 
-    FBox BoundingBox = MeshAsset->GetBoundingBox();
+    FBox BoundingBox = MeshCasilla->GetBoundingBox();
 
-    TamanyoCasilla = (BoundingBox.Max.X - BoundingBox.Min.X) * 2;
+    TamanyoCasilla = (BoundingBox.GetSize().X) * 2.f;
 
 	ZonaManager = InWorld.GetSubsystem<UZonaManager>();
 
-    CrearNavMesh();
-    MapaZonas.Reserve(TamanyoLadoMundo * TamanyoLadoMundo);
-    int indexCentral = ((TamanyoLadoMundo * TamanyoLadoMundo) - 1) / 2;
+    OleadasManager = InWorld.GetSubsystem<UOleadasManager>();
 
-    //Generar Zona Inicial
-   AZona* Zona = ZonaManager->GenerarZonaInicial(ObtenerCoordenadasDeUnaZonaConIndex(indexCentral));
-
-   MapaZonas.Insert(Zona, indexCentral);
-
-   //Obtiene el Nucleo
-   //¿?
-   
-   //Generar Zonas Esquinas
-   GenerarEsquinaMundo(0);
-   GenerarEsquinaMundo(TamanyoLadoMundo - 1);
-   GenerarEsquinaMundo(TamanyoLadoMundo * TamanyoLadoMundo - TamanyoLadoMundo);
-   GenerarEsquinaMundo(TamanyoLadoMundo * TamanyoLadoMundo - 1);
-
-  
-   SetEstadosZIndexCreados( TArray<int> {indexCentral});
-
-  //Generar Zonas Restantes
-      do {
-
-      GenerarZonasDesdeInicio();
-
-      if (Estados.Actually > 50) {
-        //AQUI SE HACE UN DELAY
-          Estados.Actually = 0;
-      }else{
-          Estados.Actually++;
-      }
-
-      } while (Estados.Fin == false);
-
-      ZonaManager->AsociarPuentesConZonas(MapaZonas);
+    InWorld.GetTimerManager().SetTimerForNextTick(this, &UMundoManager::Inicio);
 }
-
-
-
 
 UZonaManager* UMundoManager::GetZonaManager() {
     return ZonaManager;
@@ -241,11 +223,46 @@ void UMundoManager::CrearNavMesh()
     }
 }
 
-AZona* UMundoManager::GenerarEsquinaMundo(int index)
+void UMundoManager::Inicio()
 {
-    AZona* Zona = ZonaManager->GenerarZonaPortal(ObtenerCoordenadasDeUnaZonaConIndex(index));
+    CrearNavMesh();
+    MapaZonas.Init(nullptr, TamanyoLadoMundo * TamanyoLadoMundo);
+    int indexCentral = ((TamanyoLadoMundo * TamanyoLadoMundo) - 1) / 2;
+
+    //Generar Zona Inicial
+    AZona* Zona = ZonaManager->GenerarZonaInicial(ObtenerCoordenadasDeUnaZonaConIndex(indexCentral));
+    MapaZonas[indexCentral] = Zona;
     
-    return Zona;
+    //Generar Zonas Portal
+    GenerarEsquinasMundo();
+	
+    SetEstadosZIndexCreados(TArray<int> {indexCentral});
+
+    //Generar Zonas Restantes
+    do {
+
+        GenerarZonasDesdeInicio();
+
+        if (Estados.Actually > 50) {
+            //AQUI SE HACE UN DELAY
+            Estados.Actually = 0;
+        }
+        else {
+            Estados.Actually++;
+        }
+
+    } while (Estados.Fin == false);
+
+    ZonaManager->AsociarPuentesConZonas(MapaZonas);
+}
+
+void UMundoManager::GenerarEsquinasMundo()
+{
+    const TArray<int> PosicionesEsquina = { 0,TamanyoLadoMundo - 1,TamanyoLadoMundo * TamanyoLadoMundo - TamanyoLadoMundo,TamanyoLadoMundo * TamanyoLadoMundo - 1 };
+    for (int Posicion : PosicionesEsquina) {
+        MapaZonas[Posicion] = ZonaManager->GenerarZonaPortal(ObtenerCoordenadasDeUnaZonaConIndex(Posicion));
+    }
+	  
 }
 
 void UMundoManager::ObtenerCasillaParaColocar(FVector LocalizacionPlayer, FDatosCasillas& Casilla, FVector2D& CoordenadasCasilla)
@@ -285,35 +302,32 @@ void UMundoManager::GenerarZonasDesdeInicio()
         for (int item : Estados.ZIndexCreados) {
             FVector2D Coordenadas = ObtenerCoordenadasDeUnaZonaConIndex(item);
             ComprobarZonasAdyacentes(Coordenadas, ZonasAdyacentes, ZonasVacias);
-
             for (int item2 : ZonasVacias) {
                 Estados.ZIndexAdyacentes.AddUnique(item2);
             }
         }
+        Estados.ZBuscarMas = false;
     }
-
     if (Estados.ZIndexAdyacentes.IsEmpty()) {
         Estados.Fin = true;
     }
     else {
 
-        AZona* Zona = GetZonaManager()->GenerarZona(ObtenerCoordenadasDeUnaZonaConIndex(Estados.ZIndexAdyacentes[0]));
+        AZona* Zona = ZonaManager->GenerarZona(ObtenerCoordenadasDeUnaZonaConIndex(Estados.ZIndexAdyacentes[0]));
         if (Zona) {
-
             MapaZonas[Estados.ZIndexAdyacentes[0]] = Zona;
             Estados.ZIndexCreados.Add(Estados.ZIndexAdyacentes[0]);
-            Estados.ZIndexAdyacentes.Remove(Estados.ZIndexAdyacentes[0]);
+            Estados.ZIndexAdyacentes.RemoveAt(0);
 
             if (Estados.ZIndexAdyacentes.IsEmpty()) Estados.ZBuscarMas = true;
 
         }
     }
-
 }
 
 void UMundoManager::ComprobarZonasAdyacentes(FVector2D Coordenada, TArray<AZona*>& ZonasAdyacentes, TArray<int>& ZonasVacias)
 {
-    TArray<FVector2D> PosicionesPosibles = ObtenerPosiblesAdyacentes(FVector2D((TamanyoLadoZona * TamanyoCasilla) + (TamanyoCasilla * 2), (TamanyoLadoZona * TamanyoCasilla) + (TamanyoCasilla * 2)), TamanyoLadoMundo);
+    TArray<FVector2D> PosicionesPosibles = ObtenerPosiblesAdyacentes(FVector2D(Coordenada.X/((TamanyoLadoZona * TamanyoCasilla) + (TamanyoCasilla * 2)), Coordenada.Y/((TamanyoLadoZona * TamanyoCasilla) + (TamanyoCasilla * 2))), TamanyoLadoMundo);
     
     for(FVector2D PosicionPosible : PosicionesPosibles){
       AZona* Zona = MapaZonas[PosicionPosible.X + (PosicionPosible.Y * TamanyoLadoMundo)];
@@ -414,4 +428,12 @@ void UMundoManager::GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransf
             }
         }
     }
+}
+
+bool UMundoManager::ShouldCreateSubsystem(UObject* Outer) const
+{
+    TArray<UClass*> ChildClasses;
+    GetDerivedClasses(GetClass(), ChildClasses, false);
+
+    return ChildClasses.Num() == 0;
 }

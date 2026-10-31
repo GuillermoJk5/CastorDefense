@@ -52,7 +52,17 @@ struct FDatosCasillas
 	{
 	}
 
-	FDatosCasillas(ETipoCasilla Tipo, FVector2D GridPosition,bool Ocupada, APuente* PuenteAsociado)
+	FDatosCasillas(ETipoCasilla Tipo, FVector2D GridPosition,bool Ocupada)
+		:IndexLocal()
+		, Tipo(Tipo)
+		, GridPosition(GridPosition)
+		, HIDuenyo()
+		, Ocupada(Ocupada)
+		, PuenteAsociado()
+	{
+	}
+
+	FDatosCasillas(ETipoCasilla Tipo, FVector2D GridPosition, bool Ocupada, APuente* PuenteAsociado)
 		:IndexLocal()
 		, Tipo(Tipo)
 		, GridPosition(GridPosition)

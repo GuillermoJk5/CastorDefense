@@ -11,6 +11,14 @@
 
 #include "TimerManager.h"
 
+void UOleadasManager::OnWorldBeginPlay(UWorld& InWorld)
+{
+	Super::OnWorldBeginPlay(InWorld);
+
+	EnemigoManager = InWorld.GetSubsystem<UEnemigoManager>();
+
+}
+
 UMundoManager* UOleadasManager::GetMundoManager(){
 	return this->MundoManager;
 }

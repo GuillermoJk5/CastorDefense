@@ -17,6 +17,8 @@ class UPinguinoManager;
 class UMundoManager;
 class ANucleo;
 class AZona;
+class AZonaInicial;
+class AZonaPortal;
 
 /**
  * Clase que se encarga de gestionar las zonas del mundo
@@ -50,6 +52,9 @@ public:
 
 	UFUNCTION()
 	FRotator RotarPuentes(FVector2D PosicionCasilla);
+
+	//UFUNCTION()
+	//void AsignarDatosCasillasAZona(AZona* Zona, FVector2D CoordenadasZona);
 
 	UFUNCTION()
 	AZona* GenerarZona(FVector2D CoordenadasZona);
@@ -113,4 +118,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Migracion");
 	UPinguinoManager* PinguinoManager;
 
+	UPROPERTY()
+	TArray<TSubclassOf<AZona>> ClasesZonas;
+
+	UPROPERTY()
+	TArray<TSubclassOf<AZonaInicial>> ClasesZonasIniciales;
+
+	UPROPERTY()
+	TArray<TSubclassOf<AZonaPortal>> ClasesZonasPortales;
+
+	/*
+	UPROPERTY(EditAnywhere, Category = "Migracion", meta = (AllowPrivateAcces = "true"))
+	TArray<TSoftClassPtr<AZona>> ZonasCargadas;
+
+	*/
 };

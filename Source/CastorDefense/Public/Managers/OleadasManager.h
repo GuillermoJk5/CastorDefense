@@ -14,12 +14,14 @@ class AZona;
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class CASTORDEFENSE_API UOleadasManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
 public:
+
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
 	UFUNCTION(Category = "Getter")
 	UMundoManager* GetMundoManager();

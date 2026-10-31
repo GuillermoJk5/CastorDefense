@@ -15,7 +15,7 @@ class UZonaManager;
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class CASTORDEFENSE_API UEnemigoManager : public UWorldSubsystem
 {
 	GENERATED_BODY()

@@ -24,6 +24,9 @@ public:
 	AZona();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USceneComponent> Root;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -38,13 +41,13 @@ public:
 	void SetInterseccion(bool InInterseccion);
 
 	UFUNCTION(Category = "Getter")
-	TArray<FDatosCasillas> GetDatosCasillas();
+	TArray<FDatosCasillas>& GetDatosCasillas();
 
 	UFUNCTION(Category = "Setter")
 	void SetDatosCasillas(TArray<FDatosCasillas> InInterseccion);
 
 	UFUNCTION(Category = "Getter")
-	TArray<FDatosCasillas> GetDatosCasillasPuentes();
+	TArray<FDatosCasillas>& GetDatosCasillasPuentes();
 
 	UFUNCTION(Category = "Setter")
 	void SetDatosCasillasPuentes(TArray<FDatosCasillas> InInterseccion);

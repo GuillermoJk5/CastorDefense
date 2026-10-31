@@ -6,7 +6,7 @@ public class CastorDefense : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem" ,"EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem" ,"EnhancedInput", "DeveloperSettings" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "AssetRegistry" });
 

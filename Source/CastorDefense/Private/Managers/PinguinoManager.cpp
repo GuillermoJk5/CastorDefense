@@ -13,7 +13,6 @@ void UPinguinoManager::OnWorldBeginPlay(UWorld& InWorld)
 	Super::OnWorldBeginPlay(InWorld);
 
 	ZonaManager = InWorld.GetSubsystem<UZonaManager>();
-
 }
 
 UZonaManager* UPinguinoManager::GetZonaManager() {
@@ -26,12 +25,13 @@ void UPinguinoManager::SetZonaManager(UZonaManager* InZonaManager) {
     this->ZonaManager = InZonaManager;
 }
 
-bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArray <ETipoCasilla> MapaSimplificado) {
+bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArray<ETipoCasilla> MapaSimplificado) {
+
     TArray<FVector2D> ProbMovimientoEstatica = { FVector2D(0.f, 1.f), FVector2D(0.f, -1.f), FVector2D(1.f, 0.f), FVector2D(-1.f, 0.f) };
     ZonaManager->GetMundoManager()->SetEstadosZonaTerminada(true);
     if (MapaSimplificado.IsEmpty()) {
         //Si MapaRecursivo Viene Vacio: Resiceamos el Array,
-        MapaSimplificado.SetNum(ZonaManager->GetMundoManager()->GetTamanyoLadoZona() * ZonaManager->GetMundoManager()->GetTamanyoLadoZona());
+        MapaSimplificado.Init(ETipoCasilla::NaN, ZonaManager->GetMundoManager()->GetTamanyoLadoZona() * ZonaManager->GetMundoManager()->GetTamanyoLadoZona());
         ZonaManager->GetMundoManager()->
             SetEstadosMapaAPintar(MapaSimplificado)->
             SetEstadosPosicionActual(PuentesRestantes[FMath::RandRange(0, PuentesRestantes.Num() - 1)]);
@@ -45,7 +45,6 @@ bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArr
                 MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(Puente, ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
                     = ETipoCasilla::Puente;
             }
-            ZonaManager->ObtenerIndexConPosicionCasillasOZonas(Puente, ZonaManager->GetMundoManager()->GetTamanyoLadoZona());
         }
         //Comprobamos si hay puente esquinado
         bool Correcto;
@@ -105,11 +104,11 @@ bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArr
 
     if (ZonaManager->GetMundoManager()->ComprobarLimitesDeMatriz(PosicionAleatoriaCasillaNueva, ZonaManager->GetMundoManager()->GetTamanyoLadoZona())) {
         //Donde se va a crear hay ya casilla?? COMPROBACIONES
-        TArray<FVector2D> PCA;
+        TArray<FVector2D> PosicionesCasillasAdyacentes; //Posicion Casilla Adyacente
         TArray<ETipoCasilla> CasillasAdyacentesSimplificado;
         if (MapaSimplificado[Index] == ETipoCasilla::NaN) {
             //Comprobar la casilla Actual en busca de errores en el camino
-            ZonaManager->ComprobarSiHayCasillasAdyacentes(ZonaManager->GetMundoManager()->GetEstados().PosicionActual, MapaSimplificado, PCA, CasillasAdyacentesSimplificado);
+            ZonaManager->ComprobarSiHayCasillasAdyacentes(ZonaManager->GetMundoManager()->GetEstados().PosicionActual, MapaSimplificado, PosicionesCasillasAdyacentes, CasillasAdyacentesSimplificado);
             
             if (
                 ComprobarTipoMaxCasillasAdyacentes(
@@ -119,7 +118,7 @@ bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArr
                 )
             ) {
                 //Comprobacion de la Nueva Casilla; Una casilla de camino solo puede tener 1 casilla de Camino antes de ser creada
-                ZonaManager->ComprobarSiHayCasillasAdyacentes(PosicionAleatoriaCasillaNueva, MapaSimplificado, PCA, CasillasAdyacentesSimplificado);
+                ZonaManager->ComprobarSiHayCasillasAdyacentes(PosicionAleatoriaCasillaNueva, MapaSimplificado, PosicionesCasillasAdyacentes, CasillasAdyacentesSimplificado);
 
                 if (
                     ComprobarTipoMaxCasillasAdyacentes(
@@ -128,62 +127,80 @@ bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArr
                         , ETipoCasilla::Camino
                     )
                     ) {
-                    ETipoCasilla TipoCasillaAdyacente = ObtenerDestinoAdyacente(CasillasAdyacentesSimplificado);
-                    switch (TipoCasillaAdyacente) {
-                    case ETipoCasilla::PuenteConectado:
-                    case ETipoCasilla::NaN:
-                        if (TipoCasillaAdyacente == ETipoCasilla::PuenteConectado) {
-                            //Comprobaciones de las casillas Adyacentes, en caso de que sean Destinos validos
-                            
-                            ZonaManager->ComprobarSiHayCasillasAdyacentes(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::PuenteConectado, PCA),MapaSimplificado, PCA, CasillasAdyacentesSimplificado);
-
-                            if (!(CasillasAdyacentesSimplificado.Num() == 0)) {
-                                CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva,MapaSimplificado);
+                    if (CasillasAdyacentesSimplificado.Contains(ETipoCasilla::CaminoConectado)) {
+                        bool Correcto;
+                        bool PuenteAdyacente;
+                        ComprobarDestinoCamino(CasillasAdyacentesSimplificado, Correcto, PuenteAdyacente);
+                        if (!Correcto) {
+                            CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
+                        }
+                        else {
+                            if (PuenteAdyacente) {
+                                if (ComprobarTipoMaxCasillasAdyacentes(CasillasAdyacentesSimplificado, 1, ETipoCasilla::Puente)) {
+                                    //ParteFinal
+                                    //Si el destino es puente; Reasignamos Puente como PuenteConectado y lo borramos de Puentes Restantes
+                                    UE_LOG(LogTemp, Warning, TEXT("X:%f, Y:%f"), ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes).X, ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes).Y);
+                                    MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes), ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
+                                        = ETipoCasilla::PuenteConectado;
+                                    PuentesRestantes.Remove(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes));
+                                    ZonaManager->GetMundoManager()->SetEstadosPosicionesPuentes(PuentesRestantes);
+                                    return HaciaFinPinguino(PuentesRestantes, MapaSimplificado, PosicionAleatoriaCasillaNueva);
+                                }
+                                else {
+                                    CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
+                                }
                             }
-                          
+                            else {
+                                //"Creamos" la casilla
+                                MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(PosicionAleatoriaCasillaNueva, ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
+                                    = ETipoCasilla::Camino;
+
+                                return HaciaFinPinguino(PuentesRestantes, MapaSimplificado, PosicionAleatoriaCasillaNueva);
+                            }
+                        }
+                        
+                    }
+                    else if (CasillasAdyacentesSimplificado.Contains(ETipoCasilla::PuenteConectado)) {
+                        //Comprobaciones de las casillas Adyacentes, en caso de que sean Destinos validos
+
+
+                        if (!ComprobacionesPuenteConectado(MapaSimplificado, ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::PuenteConectado, PosicionesCasillasAdyacentes))) {
+                            CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
+                            return false;
                         }
                         //"Creamos" la casilla
                         MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(PosicionAleatoriaCasillaNueva, ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
                             = ETipoCasilla::Camino;
-                        break;
-                    case ETipoCasilla::Puente:
-                    case ETipoCasilla::CaminoConectado:
-                        //Comprobaciones de las casillas Adyacentes, en caso de que sean Destinos validos
-                        if (TipoCasillaAdyacente == ETipoCasilla::Puente) {
-                            if (ZonaManager->GetMundoManager()->GetEstados().PosicionesPuentes.Num() == 1 && ZonaManager->GetMundoManager()->GetEstados().TieneQueSerInterseccion) {
-                                CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
-                            }
-                        }
-                        else {
-                            bool Correcto;
-                            bool PuenteAdyacente;
-                            ComprobarDestinoCamino(CasillasAdyacentesSimplificado, Correcto, PuenteAdyacente);
-                            if (!Correcto) {
-                                CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
-                            }
-                            else {
-                                if (!PuenteAdyacente) {
-                                    return HaciaFinPinguino(PuentesRestantes, MapaSimplificado, PosicionAleatoriaCasillaNueva);
-                                }
-                            }
+
+                        HaciaCrearCasillaYContinuar(ProbMovimientoEstatica, PosicionAleatoriaCasillaNueva, MapaSimplificado);
+                    }
+                    else if (CasillasAdyacentesSimplificado.Contains(ETipoCasilla::Puente)) {
+                        if (ZonaManager->GetMundoManager()->GetEstados().PosicionesPuentes.Num() == 1 && ZonaManager->GetMundoManager()->GetEstados().TieneQueSerInterseccion) {
+                            CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
                         }
                         if (ComprobarTipoMaxCasillasAdyacentes(CasillasAdyacentesSimplificado, 1, ETipoCasilla::Puente)) {
                             //ParteFinal
                             //Si el destino es puente; Reasignamos Puente como PuenteConectado y lo borramos de Puentes Restantes
-                            MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PCA), ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
+                            MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes), ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
                                 = ETipoCasilla::PuenteConectado;
-                            PuentesRestantes.Remove(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PCA));
+                            PuentesRestantes.Remove(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes));
                             ZonaManager->GetMundoManager()->SetEstadosPosicionesPuentes(PuentesRestantes);
+                            //"Creamos" la casilla
+                            MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(PosicionAleatoriaCasillaNueva, ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
+                                = ETipoCasilla::Camino;
                             return HaciaFinPinguino(PuentesRestantes, MapaSimplificado, PosicionAleatoriaCasillaNueva);
                         }
                         else {
                             CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
                         }
-                        break;
-                    
-
                     }
+                    else {
+                        //"Creamos" la casilla
+                        MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(PosicionAleatoriaCasillaNueva, ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
+                            = ETipoCasilla::Camino;
 
+                        HaciaCrearCasillaYContinuar(ProbMovimientoEstatica, PosicionAleatoriaCasillaNueva, MapaSimplificado);
+                    }
                 }
                 else {
                     CalcularProbabilidadesDelMovimiento(PosicionAleatoriaCasillaNueva, MapaSimplificado);
@@ -218,11 +235,11 @@ TArray<FVector2D> UPinguinoManager::CambiarProbabilidadMovimiento(FVector2D Casi
 
     for (FVector2D item : DireccionDinamica) {
     
-        if (item == (CasillaNueva - CasillaActual) && item == FVector2D(0, 0)) {
+        if (item == (CasillaNueva - CasillaActual)) {
             
             DireccionDinamica.Remove(item);
 
-            break;
+            return DireccionDinamica;
         }
     
     }
@@ -238,30 +255,42 @@ FVector2D UPinguinoManager::DireccionDelPinguino(TArray<FVector2D> Probabilidad,
 
 bool UPinguinoManager::ComprobarTipoMaxCasillasAdyacentes(TArray<ETipoCasilla> DireccionDinamica, int MaximoDeCasillas, ETipoCasilla TipoDeCasilla)
 {
-    return false;
+    int CasillasDelTipo = 0;
+    for (ETipoCasilla Item : DireccionDinamica) {
+        if (Item == TipoDeCasilla) {
+            CasillasDelTipo++;
+        }
+    }
+    return CasillasDelTipo <= MaximoDeCasillas;
 }
 
 bool UPinguinoManager::ComprobacionesPuenteConectado(TArray<ETipoCasilla> MapaSimple, FVector2D PosicionPuente)
 {
-    return false;
+    TArray<ETipoCasilla> CasillasExistentesSimplificado;
+    TArray<FVector2D> PosicionesCasillasAdyacentes;
+    ZonaManager->ComprobarSiHayCasillasAdyacentes(PosicionPuente, MapaSimple,PosicionesCasillasAdyacentes ,CasillasExistentesSimplificado);
+    return CasillasExistentesSimplificado.Num() == 0;
 }
 
 void UPinguinoManager::ComprobarDestinoCamino(TArray<ETipoCasilla> CasillasAdyacentesExistentes, bool& Bool, bool& PuenteAdyacente)
 {
-    Bool = false;
-    PuenteAdyacente = false;
-    if (!(CasillasAdyacentesExistentes.Contains(ETipoCasilla::Camino) || CasillasAdyacentesExistentes.Contains(ETipoCasilla::PuenteConectado))) {
+    
+    if (CasillasAdyacentesExistentes.Contains(ETipoCasilla::Camino) && CasillasAdyacentesExistentes.Contains(ETipoCasilla::PuenteConectado)) {
+        Bool = false;
+        PuenteAdyacente = false;
+    }
+    else {
         uint8 Contador = 0;
         for (ETipoCasilla TipoCasillaAdyacente : CasillasAdyacentesExistentes) {
             if (TipoCasillaAdyacente == ETipoCasilla::CaminoConectado) {
                 Contador++;
                 if (Contador > 1) {
+                    Bool = true;
+                    PuenteAdyacente = CasillasAdyacentesExistentes.Contains(ETipoCasilla::Puente);
                     return;
                 }
             }
         }
-        Bool = true;
-        PuenteAdyacente = true;
     }
 }
 
@@ -269,6 +298,7 @@ bool UPinguinoManager::HaciaFinPinguino(TArray<FVector2D> PuentesRestantes, TArr
 {
     if (!PuentesRestantes.IsEmpty()) {
         int Index = 0;
+
         for (ETipoCasilla TipoCasillaIteracion : MapaSimplificado) {
             if (TipoCasillaIteracion == ETipoCasilla::Camino) {
                 MapaSimplificado[Index] = ETipoCasilla::CaminoConectado;
@@ -277,7 +307,7 @@ bool UPinguinoManager::HaciaFinPinguino(TArray<FVector2D> PuentesRestantes, TArr
         }
         ZonaManager->GetMundoManager()
             ->SetEstadosMapaAPintar(MapaSimplificado)
-            ->SetEstadosPosicionActual(PosicionAleatoriaNuevaCasilla)
+            ->SetEstadosPosicionActual(PuentesRestantes[FMath::RandRange(0, PuentesRestantes.Num() - 1)])
             ->SetEstadosZonaTerminada(false)
             ->SetEstadosCantidadFinCiclos(ZonaManager->GetMundoManager()->GetEstados().CantidadFinCiclos + 1);
         return false;
@@ -292,8 +322,7 @@ bool UPinguinoManager::HaciaFinPinguino(TArray<FVector2D> PuentesRestantes, TArr
 
 void UPinguinoManager::HaciaCrearCasillaYContinuar(TArray<FVector2D> ProbMovimientoEstatica,FVector2D PosicionAleatoriaNuevaCasilla,TArray<ETipoCasilla> MapaAPintar)
 {
-
-    if (ZonaManager->GetMundoManager()->GetEstados().Cantidad <= 500) {
+    if (ZonaManager->GetMundoManager()->GetEstados().Cantidad <= 1000) {
     
         ZonaManager->GetMundoManager()
             ->SetEstadosMapaAPintar(MapaAPintar)

@@ -11,7 +11,7 @@ class ABala;
 class ATorreta;
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CASTORDEFENSE_API UCargadorTorretas : public UActorComponent
 {
 	GENERATED_BODY()
@@ -66,18 +66,18 @@ public:
 
 private:
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Categoria", meta = (AllowPrivateAccess = "true"))
 	int CapacidadMax = 10;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Categoria", meta = (AllowPrivateAccess = "true"))
 	int Municion = 20;
-		
-	UPROPERTY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Categoria", meta = (AllowPrivateAccess = "true"))
 	TArray<ABala*> Balas;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Categoria", meta = (AllowPrivateAccess = "true"))
 	int IndexBalas = 0;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Categoria", meta = (AllowPrivateAccess = "true"))
 	ETipoMunicion TipoMunicionPermitida = ETipoMunicion::Balas;
 };

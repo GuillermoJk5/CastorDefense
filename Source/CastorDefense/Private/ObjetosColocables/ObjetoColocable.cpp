@@ -80,7 +80,7 @@ void AObjetoColocable::DesActivar()
 	Activada = !Activada;
 }
 
-void AObjetoColocable::CalcularEnergiaYActuvar()
+void AObjetoColocable::CalcularEnergiaYActivar()
 {
 	if (Nucleo->ActualizarEnergia(CosteDeEnergia *= -1)) {
 		DesActivar();

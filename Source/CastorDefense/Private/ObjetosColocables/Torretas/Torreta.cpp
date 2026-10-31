@@ -6,8 +6,22 @@
 #include "TimerManager.h"
 #include "ObjetosColocables/Torretas/CargadorTorretas.h"
 
+#include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+
+ATorreta::ATorreta()
+{
+	UArrowComponent* OrientacionArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("OrientacionArrow"));
+	RootComponent = OrientacionArrow;
+
+	AreaDeteccion = CreateDefaultSubobject<USphereComponent>(TEXT("AreaDeteccion"));
+	AreaRango = CreateDefaultSubobject<USphereComponent>(TEXT("AreaRango"));
+	AC_CargadorTorreta = CreateDefaultSubobject<UCargadorTorretas>(TEXT("AC_CargadorTorreta"));
+
+	AreaDeteccion->SetupAttachment(OrientacionArrow);
+	AreaRango->SetupAttachment(OrientacionArrow);
+}
 
 AEnemigo* ATorreta::GetObjetivo()
 {
@@ -28,6 +42,7 @@ void ATorreta::SetEnRango(TArray<AEnemigo*> InEnRango)
 {
 	this->EnRango = InEnRango;
 }
+
 
 UCargadorTorretas* ATorreta::GetCargadorTorreta()
 {
@@ -58,6 +73,7 @@ void ATorreta::SetAreaRango(USphereComponent* InAreaRango)
 {
 	this->AreaRango = InAreaRango;
 }
+
 
 FTimerHandle ATorreta::GetTiempoProximoDisparo()
 {
