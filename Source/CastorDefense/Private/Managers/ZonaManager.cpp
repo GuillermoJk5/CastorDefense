@@ -65,15 +65,15 @@ FRotator UZonaManager::RotarPuentes(FVector2D PosicionCasilla) {
 
     if (PosicionCasilla.X == (MundoManager->GetTamanyoLadoZona() - 1) || PosicionCasilla.X == 0) {
         if (PosicionCasilla.X == (MundoManager->GetTamanyoLadoZona() - 1)) {
-            Rotation = FRotator(0.f, 0.f, -90.f);
+            Rotation = FRotator(0.f, -90.f, 0.f);
         }
         else {
-            Rotation = FRotator(0.f, 0.f, 90.f);
+            Rotation = FRotator(0.f, 90.f, 0.f);
         }
     }
     else {
         if (PosicionCasilla.Y == (MundoManager->GetTamanyoLadoZona() - 1)) {
-            Rotation = FRotator(0.f, 0.f, 180.f);
+            Rotation = FRotator(0.f, 180.f, 0.f);
         }
         else {
             Rotation = FRotator(0.f, 0.f, 0.f);
@@ -221,7 +221,9 @@ AZona* UZonaManager::GenerarZonaInicial(FVector2D CoordenadasZona)
     if (ZonaInicial) {
 
         PintarMapaDeCasillas(MapaCasillasSimples, ZonaInicial);
-
+        for (FDatosCasillas DatosCasilla : ZonaInicial->GetDatosCasillasPuentes()) {
+            DatosCasilla.PuenteAsociado->SetActorHiddenInGame(false);
+        }
         ZonaInicial->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0), FVector(1, 1, 1)));
     }
 
@@ -273,7 +275,6 @@ AZona* UZonaManager::GenerarZonaPortal(FVector2D CoordenadasZona)
         ZonaPortal->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0)));
     }
 
-    //AsignarDatosCasillasAZona(ZonaInicial, CoordenadasZona);
     return ZonaPortal;
 }
 
@@ -532,12 +533,13 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
                 APuente* Puente = GetWorld()->SpawnActor<APuente>(
 
                     ClasePuente,
-                    FTransform(RotarPuentes(Posicion), FVector(PosiciondelPuente.Y, PosiciondelPuente.X, 0), FVector(2, 2, 2))
+                    FTransform(RotarPuentes(Posicion), FVector(PosiciondelPuente.Y, PosiciondelPuente.X, 0))
 
                 );
                 if (Puente) {
 
                     Puente->SetActorHiddenInGame(true);
+                    Puente->SetActorScale3D(FVector(2, 2, 2));
                     Zona->GetDatosCasillas().Add(FDatosCasillas(ETipoCasilla::Puente, Posicion, false, Puente));
                     Zona->GetDatosCasillasPuentes().Add(FDatosCasillas(ETipoCasilla::Puente, Posicion, false, Puente));
 
@@ -551,7 +553,7 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
                 ANucleo* Nucleo = GetWorld()->SpawnActor<ANucleo>(
 
                     ClaseObjetivo,
-                    FTransform(FRotator(), FVector(Coordenada.Y + Zona->GetActorLocation().Y, Coordenada.X + Zona->GetActorLocation().X, Zona->GetActorLocation().Z + MundoManager->GetTamanyoCasilla()), FVector(1, 1, 1))
+                    FTransform(FRotator::ZeroRotator, FVector(Coordenada.Y + Zona->GetActorLocation().Y, Coordenada.X + Zona->GetActorLocation().X, Zona->GetActorLocation().Z + MundoManager->GetTamanyoCasilla() / 2), FVector(1, 1, 1))
 
                 );
                 if (Nucleo) {

@@ -401,10 +401,11 @@ void UMundoManager::CalcularCantidadCasillasAInstanciar()
         for (const FDatosCasillas& DatosCasilla : Zona->GetDatosCasillas()) {
             FTransform Transform;
             Transform.SetLocation(FVector(
-                (DatosCasilla.GridPosition.Y * TamanyoCasilla + TamanyoCasilla * 0.5f)
-                , (DatosCasilla.GridPosition.X * TamanyoCasilla + TamanyoCasilla * 0.5f) 
-                , TamanyoCasilla * 0.5f) * 0.5f
+                (DatosCasilla.GridPosition.Y * TamanyoCasilla)
+                , (DatosCasilla.GridPosition.X * TamanyoCasilla) 
+                , 0.f)
             );
+            Transform.SetScale3D(FVector(2, 2, 2));
             TArray<FTransform>& Transforms = CantidadCasillasPorTipo.FindOrAdd(DatosCasilla.Tipo);
             Transforms.Add(Transform);
         }
