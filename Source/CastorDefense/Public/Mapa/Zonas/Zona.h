@@ -24,8 +24,20 @@ public:
 	AZona();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> Root;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Casillas", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHierarchicalInstancedStaticMeshComponent> HI_Terreno;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Casillas", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHierarchicalInstancedStaticMeshComponent> HI_Camino;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Casillas", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHierarchicalInstancedStaticMeshComponent> HI_Puente;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tipos De Hierarchical Instances (HI)", meta = (AllowPrivateAccess = "true"))
+	TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> HI;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -68,8 +80,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FDatosCasillas> DatosCasillasPuentes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tipos De Hierarchical Instances (HI)", meta = (AllowPrivateAccess = "true"))
-	TMap<ETipoCasilla, UHierarchicalInstancedStaticMeshComponent*> HI;
 
 };

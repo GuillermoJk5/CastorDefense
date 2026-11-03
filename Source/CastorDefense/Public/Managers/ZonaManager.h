@@ -16,6 +16,7 @@
 class UPinguinoManager;
 class UMundoManager;
 class ANucleo;
+class APuente;
 class AZona;
 class AZonaInicial;
 class AZonaPortal;
@@ -83,7 +84,6 @@ public:
 	UFUNCTION()
 	void ComprobarGeneracionDePuenteEsquinado(TArray<FVector2D> Puentes, FVector2D PuenteNuevo, bool& Correcto, FVector2D& MovimientoPosible);
 
-	//FALTA Objetivo, HIX
 	UFUNCTION()
 	void PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, AZona* Zona);
 
@@ -127,9 +127,11 @@ private:
 	UPROPERTY()
 	TArray<TSubclassOf<AZonaPortal>> ClasesZonasPortales;
 
-	/*
-	UPROPERTY(EditAnywhere, Category = "Migracion", meta = (AllowPrivateAcces = "true"))
-	TArray<TSoftClassPtr<AZona>> ZonasCargadas;
+	UPROPERTY()
+	TSubclassOf<APuente> ClasePuente;
 
-	*/
+	UPROPERTY()
+	TSubclassOf<ANucleo> ClaseObjetivo;
+
+	
 };

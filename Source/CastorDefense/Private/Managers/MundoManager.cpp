@@ -254,6 +254,8 @@ void UMundoManager::Inicio()
     } while (Estados.Fin == false);
 
     ZonaManager->AsociarPuentesConZonas(MapaZonas);
+
+    CalcularCantidadCasillasAInstanciar();
 }
 
 void UMundoManager::GenerarEsquinasMundo()
@@ -394,35 +396,39 @@ TArray<FVector2D> UMundoManager::ObtenerPosiblesDiagonalesAdyacentes(FVector2D P
 
 void UMundoManager::CalcularCantidadCasillasAInstanciar()
 {
-    TMap<ETipoCasilla, TArray<FTransform>> CantidadCasillasPorTipo;
     for (AZona* Zona : MapaZonas) {
+        TMap<ETipoCasilla, TArray<FTransform>> CantidadCasillasPorTipo;
         for (const FDatosCasillas& DatosCasilla : Zona->GetDatosCasillas()) {
             FTransform Transform;
             Transform.SetLocation(FVector(
-                (DatosCasilla.GridPosition * TamanyoCasilla).X + Zona->GetActorLocation().X
-                , (DatosCasilla.GridPosition * TamanyoCasilla).Y + Zona->GetActorLocation().Y
-                , Zona->GetActorLocation().Z)
+                (DatosCasilla.GridPosition.Y * TamanyoCasilla + TamanyoCasilla * 0.5f)
+                , (DatosCasilla.GridPosition.X * TamanyoCasilla + TamanyoCasilla * 0.5f) 
+                , TamanyoCasilla * 0.5f) * 0.5f
             );
-            CantidadCasillasPorTipo[DatosCasilla.Tipo].Add(Transform);
+            TArray<FTransform>& Transforms = CantidadCasillasPorTipo.FindOrAdd(DatosCasilla.Tipo);
+            Transforms.Add(Transform);
         }
-    }
-    
-    for (const TPair<ETipoCasilla, TArray<FTransform>>& LLaveValor : CantidadCasillasPorTipo) {
-        GuardarEInstanciarCasillas(LLaveValor.Key, LLaveValor.Value);
+        for (const TPair<ETipoCasilla, TArray<FTransform>>& LLaveValor : CantidadCasillasPorTipo) {
+            GuardarEInstanciarCasillas(LLaveValor.Key, LLaveValor.Value, Zona);
+        }
     }
 }
 
-void UMundoManager::GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransform> Cantidad)
+void UMundoManager::GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransform> Cantidad, AZona* Zona)
 {
-    UHierarchicalInstancedStaticMeshComponent* HI = *MapaZonas[0]->GetHI().Find(Tipo);
-    TArray<int> Index = HI->AddInstances(Cantidad, false);
-    Algo::Reverse(Index);
-    for (AZona* Zona : MapaZonas) {
-        for (FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
+    UHierarchicalInstancedStaticMeshComponent* HIDeZona = *Zona->GetHI().Find(Tipo);
+    
+    if (IsValid(HIDeZona))
+    {
+        TArray<int> Index = HIDeZona->AddInstances(Cantidad, true);
+        Algo::Reverse(Index);
+
+        for (FDatosCasillas& DatosCasilla : Zona->GetDatosCasillas()) {
             if (DatosCasilla.Tipo == Tipo) {
                 DatosCasilla.IndexLocal = Index.Pop();
-                DatosCasilla.HIDuenyo = HI;
-                if (Index.Num()<=0) {
+                DatosCasilla.HIDuenyo = HIDeZona;
+                if (Index.Num() <= 0) {
+                    
                     return;
                 }
             }

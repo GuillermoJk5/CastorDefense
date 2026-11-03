@@ -274,10 +274,10 @@ bool UPinguinoManager::ComprobacionesPuenteConectado(TArray<ETipoCasilla> MapaSi
 
 void UPinguinoManager::ComprobarDestinoCamino(TArray<ETipoCasilla> CasillasAdyacentesExistentes, bool& Bool, bool& PuenteAdyacente)
 {
-    
+    Bool = false;
+    PuenteAdyacente = false;
     if (CasillasAdyacentesExistentes.Contains(ETipoCasilla::Camino) && CasillasAdyacentesExistentes.Contains(ETipoCasilla::PuenteConectado)) {
-        Bool = false;
-        PuenteAdyacente = false;
+        return;
     }
     else {
         uint8 Contador = 0;
@@ -285,12 +285,12 @@ void UPinguinoManager::ComprobarDestinoCamino(TArray<ETipoCasilla> CasillasAdyac
             if (TipoCasillaAdyacente == ETipoCasilla::CaminoConectado) {
                 Contador++;
                 if (Contador > 1) {
-                    Bool = true;
-                    PuenteAdyacente = CasillasAdyacentesExistentes.Contains(ETipoCasilla::Puente);
                     return;
                 }
             }
         }
+        Bool = true;
+        PuenteAdyacente = CasillasAdyacentesExistentes.Contains(ETipoCasilla::Puente);
     }
 }
 

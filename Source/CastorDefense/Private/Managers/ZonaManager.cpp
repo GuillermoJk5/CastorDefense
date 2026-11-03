@@ -24,6 +24,10 @@ void UZonaManager::OnWorldBeginPlay(UWorld& InWorld)
     ClasesZonasIniciales = GetDefault<UOpcionesDeDesarrollo>()->GetClasesZonasIniciales();
     
     ClasesZonasPortales = GetDefault<UOpcionesDeDesarrollo>()->GetClasesZonasPortales();
+
+    ClasePuente = GetDefault<UOpcionesDeDesarrollo>()->GetClasePuente();
+
+    ClaseObjetivo = GetDefault<UOpcionesDeDesarrollo>()->GetClaseObjetivo();
 }
 
 
@@ -218,7 +222,6 @@ AZona* UZonaManager::GenerarZonaInicial(FVector2D CoordenadasZona)
 
         PintarMapaDeCasillas(MapaCasillasSimples, ZonaInicial);
 
-        ZonaInicial->SetActorHiddenInGame(true);
         ZonaInicial->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0), FVector(1, 1, 1)));
     }
 
@@ -257,7 +260,7 @@ AZona* UZonaManager::GenerarZonaPortal(FVector2D CoordenadasZona)
     //SpawnactorZonaPortal
     AZonaPortal* ZonaPortal = GetWorld()->SpawnActorDeferred<AZonaPortal>(
         ClasesZonasPortales[0],
-        FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, 0), FVector(1, 1, 1)),
+        FTransform(FRotator::ZeroRotator, FVector(CoordenadasZona.Y, CoordenadasZona.X, -100), FVector(1, 1, 1)),
         nullptr,
         nullptr,
         ESpawnActorCollisionHandlingMethod::AlwaysSpawn
@@ -528,7 +531,7 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
 
                 APuente* Puente = GetWorld()->SpawnActor<APuente>(
 
-                    APuente::StaticClass(),
+                    ClasePuente,
                     FTransform(RotarPuentes(Posicion), FVector(PosiciondelPuente.Y, PosiciondelPuente.X, 0), FVector(2, 2, 2))
 
                 );
@@ -547,8 +550,8 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
 
                 ANucleo* Nucleo = GetWorld()->SpawnActor<ANucleo>(
 
-                    ANucleo::StaticClass(),
-                    FTransform(FRotator(), FVector(Coordenada.Y + Zona->GetActorLocation().Y, Coordenada.X + Zona->GetActorLocation().X, Zona->GetActorLocation().Z + 100), FVector(1, 1, 1))
+                    ClaseObjetivo,
+                    FTransform(FRotator(), FVector(Coordenada.Y + Zona->GetActorLocation().Y, Coordenada.X + Zona->GetActorLocation().X, Zona->GetActorLocation().Z + MundoManager->GetTamanyoCasilla()), FVector(1, 1, 1))
 
                 );
                 if (Nucleo) {

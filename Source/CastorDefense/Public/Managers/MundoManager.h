@@ -155,7 +155,7 @@ public:
 	void CalcularCantidadCasillasAInstanciar();
 
 	UFUNCTION()
-	void GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransform> Cantidad);
+	void GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransform> Cantidad, AZona* Zona);
 
 	FORCEINLINE FVector2D ObtenerCoordenadasDeUnaZonaConIndex(int index) {
 

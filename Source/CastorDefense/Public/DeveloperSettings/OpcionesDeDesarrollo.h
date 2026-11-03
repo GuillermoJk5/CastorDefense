@@ -9,6 +9,8 @@
 class AZona;
 class AZonaInicial;
 class AZonaPortal;
+class APuente;
+class ANucleo;
 /**
  * 
  */
@@ -28,6 +30,12 @@ public:
 	UFUNCTION()
 	const TArray<TSubclassOf<AZonaPortal>> GetClasesZonasPortales() const { return this->ClasesZonasPortales; };
 
+	UFUNCTION()
+	TSubclassOf<APuente> GetClasePuente() const { return this->ClasePuente; };
+
+	UFUNCTION()
+	TSubclassOf<ANucleo> GetClaseObjetivo() const { return this->ClaseObjetivo; };
+
 private:
 
 	UPROPERTY(Config, EditAnywhere, Category = "SpawnZona", meta = (AllowPrivateAcces = "true"))
@@ -38,4 +46,10 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = "SpawnZonaPortal", meta = (AllowPrivateAcces = "true"))
 	TArray<TSubclassOf<AZonaPortal>> ClasesZonasPortales;
+
+	UPROPERTY(Config, EditAnywhere, Category = "SpawnPuente", meta = (AllowPrivateAcces = "true"))
+	TSubclassOf<APuente> ClasePuente;
+
+	UPROPERTY(Config, EditAnywhere, Category = "SpawnObjetivo", meta = (AllowPrivateAcces = "true"))
+	TSubclassOf<ANucleo> ClaseObjetivo;
 };

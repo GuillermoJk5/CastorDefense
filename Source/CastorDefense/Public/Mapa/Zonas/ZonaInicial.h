@@ -13,5 +13,16 @@ UCLASS()
 class CASTORDEFENSE_API AZonaInicial : public AZona
 {
 	GENERATED_BODY()
+
+public:
+
+	AZonaInicial();
+
+	virtual void BeginPlay() override;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Casillas", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHierarchicalInstancedStaticMeshComponent> HI_Objetivo;
 	
 };
