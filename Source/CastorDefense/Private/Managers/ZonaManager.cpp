@@ -282,7 +282,7 @@ void UZonaManager::HabilitarZonas(AZona* Zona)
 {
     Zona->SetActorHiddenInGame(false);
 
-    for (const FDatosCasillas DatosCasilla : Zona->GetDatosCasillas()) {
+    for (const FDatosCasillas DatosCasilla : Zona->GetDatosCasillasPuentes()) {
         DatosCasilla.PuenteAsociado->SetActorHiddenInGame(false);
         if (!DatosCasilla.PuenteAsociado->GetConectadoCon()->IsHidden()) {
             DatosCasilla.PuenteAsociado->BajarPuente();
@@ -293,9 +293,8 @@ void UZonaManager::HabilitarZonas(AZona* Zona)
     MundoManager->ComprobarZonasAdyacentes(FVector2D(Zona->GetActorLocation().Y, Zona->GetActorLocation().X), ZonasAdyacentes, ZonasVacias);
     for (AZona* ZonaAdyacente : ZonasAdyacentes) {
         if (!ZonaAdyacente->IsHidden()) {
-            for (const FDatosCasillas DatosCasilla : ZonaAdyacente->GetDatosCasillas()) {
+            for (const FDatosCasillas DatosCasilla : ZonaAdyacente->GetDatosCasillasPuentes()) {
                 if (Zona == DatosCasilla.PuenteAsociado->GetConectadoCon()) {
-                   
                     DatosCasilla.PuenteAsociado->BajarPuente();
                 }
             }
@@ -533,7 +532,7 @@ void UZonaManager::PintarMapaDeCasillas(TArray<ETipoCasilla> MapaSimplificado, A
                 APuente* Puente = GetWorld()->SpawnActor<APuente>(
 
                     ClasePuente,
-                    FTransform(RotarPuentes(Posicion), FVector(PosiciondelPuente.Y, PosiciondelPuente.X, 0))
+                    FTransform(RotarPuentes(Posicion), FVector(PosiciondelPuente.Y , PosiciondelPuente.X , 0.f))
 
                 );
                 if (Puente) {

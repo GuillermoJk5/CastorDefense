@@ -17,6 +17,8 @@ void UOleadasManager::OnWorldBeginPlay(UWorld& InWorld)
 
 	EnemigoManager = InWorld.GetSubsystem<UEnemigoManager>();
 
+	MundoManager = InWorld.GetSubsystem<UMundoManager>();
+
 }
 
 UMundoManager* UOleadasManager::GetMundoManager(){

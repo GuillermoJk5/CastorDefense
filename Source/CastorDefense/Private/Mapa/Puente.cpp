@@ -4,11 +4,20 @@
 #include "Mapa/Puente.h"
 #include "Mapa/Zonas/Zona.h"
 
+#include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
+
 // Sets default values
 APuente::APuente()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	USceneComponent* SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRootComponent"));
+	RootComponent = SceneComponent;
+
+	MeshPuente = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Puente"));
+	MeshPuente->SetupAttachment(SceneComponent);
 
 }
 
@@ -48,7 +57,8 @@ void APuente::SetBajado(bool InBajado)
 
 void APuente::BajarPuente()
 {
-	this->SetActorRelativeRotation(FRotator(0.f, 160.f, 0.f));
+	
+	MeshPuente->SetRelativeRotation(MeshPuente->GetRelativeRotation() + FRotator(90.f, 0.f, 0.f));
 	this->SetBajado(true);
 }
 

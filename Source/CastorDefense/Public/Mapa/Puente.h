@@ -7,6 +7,7 @@
 #include "Puente.generated.h"
 
 class AZona;
+class UStaticMeshComponent;
 
 UCLASS(Blueprintable)
 class CASTORDEFENSE_API APuente : public AActor
@@ -18,6 +19,9 @@ public:
 	APuente();
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuenteConyo", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* MeshPuente;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

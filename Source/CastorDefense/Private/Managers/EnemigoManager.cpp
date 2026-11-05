@@ -56,19 +56,16 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 
 	if (Nucleo)
 	{
-	TArray<FDatosCasillas> Ruta = CalcularCaminoASeguir(FVector2D(Nucleo->GetActorLocation().Y, Nucleo->GetActorLocation().X), Zona, CasillaSpawn);
+		TArray<FDatosCasillas> Ruta = CalcularCaminoASeguir(FVector2D(Nucleo->GetActorLocation().Y, Nucleo->GetActorLocation().X), Zona, CasillaSpawn);
 	
+		//Comprueba que la ruta tiene la casilla objetivo
 
-	//Comprueba que la ruta tiene la casilla objetivo
-
-	if (Ruta.ContainsByPredicate([](const FDatosCasillas Elemento) 
-		{
-			return Elemento.Tipo == ETipoCasilla::Objetivo;
-		})
-	)PosicionarEnemigo(Ruta, CasillaSpawn, Zona);
-		
-
-		
+		if (Ruta.ContainsByPredicate([](const FDatosCasillas Elemento) 
+			{
+				return Elemento.Tipo == ETipoCasilla::Objetivo;
+			})
+		)
+		PosicionarEnemigo(Ruta, CasillaSpawn, Zona);
 	}
 
 }
@@ -113,8 +110,6 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 			STConFMenor.CantidadRecorrida++;
 		}
 		else {
-
-			
 			FDatosCasillas PuenteActual(
 				STConFMenor.CasillaAnterior.IndexLocal + 4, 
 				STConFMenor.CasillaAnterior.Tipo,
@@ -129,7 +124,8 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 								,STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().X)).GetSafeNormal())),
 						
 				STConFMenor.CasillaAnterior.HIDuenyo, 
-				false, nullptr);
+				false,
+				nullptr);
 
 			//SemiPuente 1
 			CaminoFin.Add(PuenteActual, STConFMenor.CasillaAnterior);
