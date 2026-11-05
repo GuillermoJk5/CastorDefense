@@ -2,6 +2,7 @@
 
 
 #include "ObjetosColocables/ObjetoColocable.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Mapa/Nucleo.h"
 
@@ -11,6 +12,7 @@ AObjetoColocable::AObjetoColocable()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	this->CasillaValida = ETipoCasilla::Terreno;
 }
 
 // Called when the game starts or when spawned
@@ -82,7 +84,11 @@ void AObjetoColocable::DesActivar()
 
 void AObjetoColocable::CalcularEnergiaYActivar()
 {
-	if (Nucleo->ActualizarEnergia(CosteDeEnergia *= -1)) {
+	if (!Nucleo) {
+		AActor* BuscoNucleo = UGameplayStatics::GetActorOfClass(GetWorld(), ANucleo::StaticClass());
+		Nucleo = Cast<ANucleo>(BuscoNucleo);
+	}
+	if (Nucleo && Nucleo->ActualizarEnergia(CosteDeEnergia *= -1)) {
 		DesActivar();
 	}
 }

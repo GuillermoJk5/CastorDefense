@@ -8,7 +8,7 @@
 #include "InputActionValue.h"
 #include "Personaje.generated.h"
 
-
+class ATorreta;
 class UInputAction;
 class UPersonajeInput;
 class UMundoManager;
@@ -16,13 +16,10 @@ class ACajaMunicion;
 struct FInputActionValue;
 struct FInputActionInstance;
 
-
-
 UCLASS()
 class CASTORDEFENSE_API APersonaje : public ACharacter
 {
 	GENERATED_BODY()
-
 
 public:
 
@@ -64,6 +61,9 @@ public:
 	APersonaje();
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ClaseTorretaASpawn", meta = (AllowPrivateAcces = "true"))
+	TSubclassOf<ATorreta> ClaseTorreta;
 
 	UFUNCTION()
 	void OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

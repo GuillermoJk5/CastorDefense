@@ -169,5 +169,7 @@ void ATorreta::BeginPlay()
 
 	AreaDeteccion->OnComponentBeginOverlap.AddDynamic(this, &ATorreta::OnOverlapBegin);
 	AreaDeteccion->OnComponentEndOverlap.AddDynamic(this, &ATorreta::OnOverlapEnd);
+
+	this->CosteDeEnergia = 100;
 }
 

@@ -70,36 +70,36 @@ void APersonaje::Colocar(ETiposColocables Tipo)
 		//MEJORAR ESTA CHAPUZA
 		switch (Tipo) {
 		
-		case ETiposColocables::Torreta:{
+			case ETiposColocables::Torreta:{
 
-			ATorreta* CajaMunicion = GetWorld()->SpawnActorDeferred<ATorreta>(
-				ATorreta::StaticClass(),
-				FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)),
-				nullptr,
-				nullptr,
-				ESpawnActorCollisionHandlingMethod::AlwaysSpawn
-			);
-			if (CajaMunicion) {
-				if (CajaMunicion->GetCasillaValida() == Casilla.Tipo) {
+				ATorreta* CajaMunicion = GetWorld()->SpawnActorDeferred<ATorreta>(
+					ClaseTorreta,
+					FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)),
+					nullptr,
+					nullptr,
+					ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+				);
+				if (CajaMunicion) {
+					if (CajaMunicion->GetCasillaValida() == Casilla.Tipo) {
 
-					CajaMunicion->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)));
+						int a = MundoManager->GetMapaZonas().Find(Cast<AZona>(Casilla.HIDuenyo->GetOwner()));
+						int b = MundoManager->GetMapaZonas()[a]->GetDatosCasillas().Find(Casilla);
 
-					int a = MundoManager->GetMapaZonas().Find(Cast<AZona>(Casilla.HIDuenyo->GetOwner()));
-					int b = MundoManager->GetMapaZonas()[a]->GetDatosCasillas().Find(Casilla);
+						MundoManager->GetMapaZonas()[a]->GetDatosCasillas()[b].Ocupada = true;
 
-					MundoManager->GetMapaZonas()[a]->GetDatosCasillas()[b].Ocupada = true;
+						CajaMunicion->CalcularEnergiaYActivar();
 
-					CajaMunicion->CalcularEnergiaYActivar();
+						CajaMunicion->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector(CoordenadasCasilla.X, CoordenadasCasilla.Y, 100)));
+					}
 				}
+
+				break;
 			}
 
-			break;
-		}
+			case ETiposColocables::Generador:{
 
-		case ETiposColocables::Generador:{
-
-			break;
-		}
+				break;
+			}
 
 		}
 
@@ -182,6 +182,7 @@ void APersonaje::Movimiento(const FInputActionValue& Value)
 {
 	FVector2D VectorMovimiento = Value.Get<FVector2D>();
 	AddMovementInput(FVector(VectorMovimiento.Y, VectorMovimiento.X, 0.f).GetSafeNormal(), 1.f);
+	UE_LOG(LogTemp, Warning, TEXT("SE EJECUTA"));
 }
 
 void APersonaje::OnRecargarTriggered(const FInputActionInstance& Instance)
@@ -312,6 +313,8 @@ void APersonaje::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MundoManager = GetWorld()->GetSubsystem<UMundoManager>();
+
 	if (APlayerController* PC = Cast<APlayerController>(Controller))
 	{
 		if(PersonajeInput && PersonajeInput->DefaultMappingContext)
@@ -341,6 +344,8 @@ void APersonaje::Tick(float DeltaTime)
 // Called to bind functionality to input
 void APersonaje::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* EIC = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EIC && PersonajeInput)
