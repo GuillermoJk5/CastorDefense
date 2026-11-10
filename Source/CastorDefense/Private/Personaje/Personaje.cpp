@@ -182,7 +182,6 @@ void APersonaje::Movimiento(const FInputActionValue& Value)
 {
 	FVector2D VectorMovimiento = Value.Get<FVector2D>();
 	AddMovementInput(FVector(VectorMovimiento.Y, VectorMovimiento.X, 0.f).GetSafeNormal(), 1.f);
-	UE_LOG(LogTemp, Warning, TEXT("SE EJECUTA"));
 }
 
 void APersonaje::OnRecargarTriggered(const FInputActionInstance& Instance)

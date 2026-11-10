@@ -17,15 +17,23 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 
+#include "limits"
 #include "Kismet/GameplayStatics.h"
 #include "Math/NumericLimits.h"
 #include "Engine/Engine.h"
+
+bool UEnemigoManager::DoesSupportWorldType(const EWorldType::Type WorldType) const
+{
+	return WorldType == EWorldType::Game || WorldType == EWorldType::PIE || WorldType == EWorldType::EditorPreview;;
+}
 
 void UEnemigoManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 
 	MundoManager = InWorld.GetSubsystem<UMundoManager>();
+
+	EnemigosGestionables = GenerarEnemigosInicioPartida();
 }
 
 UMundoManager* UEnemigoManager::GetMundoManager()
@@ -58,6 +66,7 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 	{
 		TArray<FDatosCasillas> Ruta = CalcularCaminoASeguir(FVector2D(Nucleo->GetActorLocation().Y, Nucleo->GetActorLocation().X), Zona, CasillaSpawn);
 	
+		UE_LOG(LogTemp, Warning, TEXT("%d"), Ruta.Num());
 		//Comprueba que la ruta tiene la casilla objetivo
 
 		if (Ruta.ContainsByPredicate([](const FDatosCasillas Elemento) 
@@ -74,11 +83,9 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 {
 	TMap<FDatosCasillas,FDatosCasillas>CaminoFin;
 	
-	
 	TArray<FMovimientoEnemigo> CaminosPosibles;
 	CaminosPosibles.Add(FMovimientoEnemigo(0, 0, 0, DatosCasillaActual, DatosCasillaActual, ZonaSpawn));
-	FMovimientoEnemigo STConFMenor (0,0,0,DatosCasillaActual,FDatosCasillas(),ZonaSpawn);
-	
+	FMovimientoEnemigo STConFMenor (0,0, std::numeric_limits<int>::max(),DatosCasillaActual,FDatosCasillas(),ZonaSpawn);
 	
 	while (
 		FVector2D(
@@ -118,10 +125,10 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 					+ 
 					FVector2D(
 						(
-						FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().Y
-								,STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().X)
-						,FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().Y
-								,STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().X)).GetSafeNormal())),
+						FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
+								,STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X)
+						,FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
+								,STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X)).GetSafeNormal())),
 						
 				STConFMenor.CasillaAnterior.HIDuenyo, 
 				false,
@@ -171,7 +178,7 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 		TMap <FDatosCasillas, AZona*> CasillasConZonas = ComprobarCaminosAdyacentes(STConFMenor.ZonaPerteneciente, STConFMenor.CasillaActual.GridPosition, CaminoFin);
 		CasillasConZonas.GetKeys(Casillas);
 
-		for(FDatosCasillas CasillaActual : Casillas){
+		for(const FDatosCasillas& CasillaActual : Casillas){
 			CaminosPosibles.Add(FMovimientoEnemigo(STConFMenor.CantidadRecorrida, 0, 0, CasillaActual, STConFMenor.CasillaActual, *CasillasConZonas.Find(CasillaActual)));
 			//Actually
 		}
@@ -180,22 +187,26 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 
 	bool Fin = true;
 	TMap<FDatosCasillas, FDatosCasillas> DatosCasillaCamino;
-	TArray<FDatosCasillas> Llaves;
+	TArray<FDatosCasillas> LlavesCaminoFin;
 	TArray<FDatosCasillas> RutaARellenar;
 
-	CaminoFin.GetKeys(Llaves);
-	DatosCasillaCamino.Add(Llaves.Last(), CaminoFin[Llaves.Last()]);
+	CaminoFin.GenerateKeyArray(LlavesCaminoFin);
+	DatosCasillaCamino.Add(LlavesCaminoFin.Last(), *CaminoFin.Find(LlavesCaminoFin.Last()));
 
 	while(Fin){
-		RutaARellenar.Add(Llaves[0]);
-		if(CaminoFin.Find(CaminoFin[Llaves[0]])){
-			DatosCasillaCamino.Add(CaminoFin[Llaves[0]], *CaminoFin.Find(CaminoFin[Llaves[0]]));
-			DatosCasillaCamino.Remove(Llaves[0]);
+		TArray<FDatosCasillas> LLavesDatosCasillaCamino;
+		DatosCasillaCamino.GenerateKeyArray(LLavesDatosCasillaCamino);
+		RutaARellenar.Add(LLavesDatosCasillaCamino[0]);
 
-			TArray<FDatosCasillas> LlavesDatosCasillas;
-			DatosCasillaCamino.GetKeys(LlavesDatosCasillas);
+		TArray<FDatosCasillas> ValoresDatosCasillas;
+		DatosCasillaCamino.GenerateValueArray(ValoresDatosCasillas);
 
-			if(DatosCasillaCamino.Find(LlavesDatosCasillas[0])){
+		if(CaminoFin.Find(ValoresDatosCasillas[0])) {
+			DatosCasillaCamino.Add(ValoresDatosCasillas[0], *CaminoFin.Find(ValoresDatosCasillas[0]));
+			DatosCasillaCamino.Remove(LLavesDatosCasillaCamino[0]);
+
+			DatosCasillaCamino.GenerateValueArray(ValoresDatosCasillas);
+			if(DatosCasillaCamino.Find(ValoresDatosCasillas[0])) {
 				Fin = false;
 				//Actually
 			}
@@ -316,24 +327,22 @@ TArray<AEnemigo*> UEnemigoManager::GenerarEnemigosInicioPartida()
 	int Index = 0;
 	TArray<AEnemigo*> EnemigosGenerados;
 	uint8 MaxEnemigosPorTipo = 100;
-	
+
 	for (TSubclassOf<AActor> item : Clases)
 	{
 		
-		while (EnemigosGenerados.Num() < MaxEnemigosPorTipo * Index + 1)
+		while (EnemigosGenerados.Num() < MaxEnemigosPorTipo * (Index + 1))
 		{
 			//SPAWN ENEMIGO
 			AEnemigo* Enemigo = GetWorld()->SpawnActor<AEnemigo>(
 
 				item,
-				FTransform(FRotator::ZeroRotator, FVector(0, 0, -10000), FVector(1, 1, 1))
-
+				FTransform(FRotator::ZeroRotator, FVector(0, 0, 1000), FVector(1, 1, 1))
 			);
 
 			//CHAPUCERO??
 			AAIEnemigoController* AIEnemigo = Cast<AAIEnemigoController>(Enemigo->GetController());
 			AIEnemigo->SetMundoManager(MundoManager);
-
 			EnemigosGenerados.Add(Enemigo);
 		
 			DesActivarEnemigo(Enemigo,false);
@@ -341,32 +350,25 @@ TArray<AEnemigo*> UEnemigoManager::GenerarEnemigosInicioPartida()
 		} 
 		
 	}
-
+	
 	return EnemigosGenerados;
 
 }
 
 void UEnemigoManager::DesActivarEnemigo(AEnemigo* Enemigo, bool Activar)
 {
-
+	UClaseDeUtilidades::ActivarDesactivarActor(Enemigo, Activar);
 	if (Activar) {
-
-		UClaseDeUtilidades::ActivarDesactivarActor(Enemigo, Activar);
-
 		Enemigo->GetMesh()->Activate();
 		Enemigo->GetCharacterMovement()->Activate();
-	
-		if (Cast<AEnemigo>(Enemigo)) {
-		
-			AAIEnemigoController* AI =Cast<AAIEnemigoController>(Enemigo->GetOwner());
-			AI->Avanzar();
-		}
-
+		AAIEnemigoController* AI =Cast<AAIEnemigoController>(Enemigo->GetOwner());
+		Enemigo->GetCharacterMovement()->GravityScale = 1.0f;
+		AI->Avanzar();
 	}
 	else {
-		UClaseDeUtilidades::ActivarDesactivarActor(Enemigo, Activar);
 		Enemigo->GetCharacterMovement()->Deactivate();
 		Enemigo->GetMesh()->Deactivate();
+		Enemigo->GetCharacterMovement()->GravityScale = 0.0f;
 	}
 }
 
@@ -379,11 +381,11 @@ void UEnemigoManager::PosicionarEnemigo(TArray<FDatosCasillas> Ruta, FDatosCasil
 	AEnemigo* Enemigo;
 
 	do{
-	Enemigo = EnemigosGestionables[Index];
+		Enemigo = EnemigosGestionables[Index];
 	
-	Index++;
+		Index++;
 
-	} while (Enemigo->IsHidden() == true);
+	} while (Enemigo->IsHidden() == false);
 
 
 	FVector2D Posicion = DatosCasilla.GridPosition * MundoManager->GetTamanyoCasilla() + FVector2D(Zona->GetActorLocation().Y, Zona->GetActorLocation().X);

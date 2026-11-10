@@ -424,14 +424,23 @@ void UMundoManager::GuardarEInstanciarCasillas(ETipoCasilla Tipo, TArray<FTransf
         TArray<int> Index = HIDeZona->AddInstances(Cantidad, true);
         Algo::Reverse(Index);
 
+        int indexPuente = 0;
         for (FDatosCasillas& DatosCasilla : Zona->GetDatosCasillas()) {
             if (DatosCasilla.Tipo == Tipo) {
-                DatosCasilla.IndexLocal = Index.Pop();
+                int IndexLocal = Index.Pop();
+                if (DatosCasilla.Tipo == ETipoCasilla::Puente) {
+                    Zona->GetDatosCasillasPuentes()[indexPuente].IndexLocal = IndexLocal;
+                    Zona->GetDatosCasillasPuentes()[indexPuente].HIDuenyo = HIDeZona;
+                    indexPuente++;
+                }
+                DatosCasilla.IndexLocal = IndexLocal;
                 DatosCasilla.HIDuenyo = HIDeZona;
+
                 if (Index.Num() <= 0) {
                     
                     return;
                 }
+                
             }
         }
     }

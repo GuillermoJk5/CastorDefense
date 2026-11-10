@@ -23,7 +23,7 @@ struct FDatosCasillas
 	UPROPERTY()
 	FVector2D GridPosition;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UHierarchicalInstancedStaticMeshComponent* HIDuenyo;
 
 	UPROPERTY()

@@ -112,15 +112,15 @@ void UOleadasManager::EncontrarSpawns(TArray<FDatosCasillas>& PosicionesSpawns, 
 void UOleadasManager::GenerarEnemigosMientrasHayaSaldo(TArray<FDatosCasillas> PosicionesSpawns, TArray<AZona*> ZonasConSpawns){
 	
 	int Index = 0;
-	for (FDatosCasillas DatosCasilla : PosicionesSpawns) {
-		Index++;
+	for (const FDatosCasillas& DatosCasilla : PosicionesSpawns) {
 		if (SaldoGeneracionEnemigo <= 0)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(TimerHandle_GeneradorDeEnemigos);
 			return;
 		}
 		EnemigoManager->ActivarEnemigo(ZonasConSpawns[Index], DatosCasilla);
-		SaldoGeneracionEnemigo -= 5;
+		SaldoGeneracionEnemigo -= 1;
+		Index++;
 	}
 
 	if (SaldoGeneracionEnemigo > 0) {

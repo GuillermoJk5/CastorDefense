@@ -22,6 +22,8 @@ class CASTORDEFENSE_API UEnemigoManager : public UWorldSubsystem
 	
 public:
 
+	virtual bool DoesSupportWorldType(const EWorldType::Type WorldType) const override;
+
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
 	UFUNCTION(Category = "Getter")
