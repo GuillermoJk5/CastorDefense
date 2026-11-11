@@ -5,9 +5,18 @@
 #include "Enemigo/Enemigo.h"
 #include "ClaseDeUtilidades.h"
 
+#include "Components/StaticMeshComponent.h"
+
 // Sets default values
 ANucleo::ANucleo()
 {
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	RootComponent = MeshComp;
+
+	MeshComp->OnComponentHit.AddDynamic(this, &ANucleo::OnHandleHit);
+	//MeshComp->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+	MeshComp->SetCanEverAffectNavigation(false);
+	MeshComp->SetNotifyRigidBodyCollision(true);
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	EnergiaMax = 200;
@@ -59,6 +68,8 @@ void ANucleo::SetMunicionCreada(TArray<ACajaMunicion*> inMunicionCreada)
 void ANucleo::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 	this->SetEnergiaRestante(this->EnergiaMax);
 	
 }
@@ -72,7 +83,6 @@ void ANucleo::Tick(float DeltaTime)
 
 void ANucleo::OnHandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	
 	AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor);
 	if(Enemigo)
 	{

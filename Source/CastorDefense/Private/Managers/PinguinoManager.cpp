@@ -139,7 +139,6 @@ bool UPinguinoManager::PinguinoBorracho(TArray<FVector2D> PuentesRestantes, TArr
                                 if (ComprobarTipoMaxCasillasAdyacentes(CasillasAdyacentesSimplificado, 1, ETipoCasilla::Puente)) {
                                     //ParteFinal
                                     //Si el destino es puente; Reasignamos Puente como PuenteConectado y lo borramos de Puentes Restantes
-                                    UE_LOG(LogTemp, Warning, TEXT("X:%f, Y:%f"), ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes).X, ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes).Y);
                                     MapaSimplificado[ZonaManager->ObtenerIndexConPosicionCasillasOZonas(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes), ZonaManager->GetMundoManager()->GetTamanyoLadoZona())]
                                         = ETipoCasilla::PuenteConectado;
                                     PuentesRestantes.Remove(ObtenerPosicionDestino(CasillasAdyacentesSimplificado, ETipoCasilla::Puente, PosicionesCasillasAdyacentes));

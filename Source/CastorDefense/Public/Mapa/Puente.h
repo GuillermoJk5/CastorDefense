@@ -20,7 +20,7 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuenteConyo", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puente", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* MeshPuente;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -57,6 +57,9 @@ public:
 	void GenerarMunicion(ETipoMunicion TipoMunicion, ETamanyoMunicion TamanyoMunicion, AActor* Generador/*Falta Icono??*/);
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> MeshComp;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

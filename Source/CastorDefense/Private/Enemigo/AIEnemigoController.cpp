@@ -59,7 +59,7 @@ void AAIEnemigoController::IrA(FVector2D Coordenadas)
 	//Cambio el MoveTo a MoveToLocation por q es menos complejo
 	MoveToLocation(
 		FVector(Coordenadas.Y,Coordenadas.X,200),
-		10,		//Aceptable Radius
+		5.f,		//Aceptable Radius
 		false	//Overlap
 	);
 }

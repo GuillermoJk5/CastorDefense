@@ -65,8 +65,7 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 	if (Nucleo)
 	{
 		TArray<FDatosCasillas> Ruta = CalcularCaminoASeguir(FVector2D(Nucleo->GetActorLocation().Y, Nucleo->GetActorLocation().X), Zona, CasillaSpawn);
-	
-		UE_LOG(LogTemp, Warning, TEXT("%d"), Ruta.Num());
+
 		//Comprueba que la ruta tiene la casilla objetivo
 
 		if (Ruta.ContainsByPredicate([](const FDatosCasillas Elemento) 
@@ -110,14 +109,17 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 			}
 		}
 
+		CaminoFin.Add(STConFMenor.CasillaActual, STConFMenor.CasillaAnterior);
 
-		if (!(STConFMenor.CasillaActual.Tipo == ETipoCasilla::Puente) && !(STConFMenor.CasillaAnterior.Tipo == ETipoCasilla::Puente) || CaminoFin.IsEmpty()) {
+		if ((CaminoFin.IsEmpty()) || !(STConFMenor.CasillaAnterior.Tipo == ETipoCasilla::Puente && STConFMenor.CasillaActual.Tipo == ETipoCasilla::Puente)) {
 
-			CaminoFin.Add(STConFMenor.CasillaActual, STConFMenor.CasillaAnterior);
+			//CaminoFin.Add(STConFMenor.CasillaActual, STConFMenor.CasillaAnterior);
 			STConFMenor.CantidadRecorrida++;
 		}
 		else {
-			FDatosCasillas PuenteActual(
+			/*
+			* SI QUISIERAMOS PUENTES NO LINEALES
+				FDatosCasillas PuenteActual(
 				STConFMenor.CasillaAnterior.IndexLocal + 4, 
 				STConFMenor.CasillaAnterior.Tipo,
 				FVector2D(
@@ -125,10 +127,10 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 					+ 
 					FVector2D(
 						(
-						FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
-								,STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X)
-						,FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
-								,STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X)).GetSafeNormal())),
+						FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
+								,STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X)
+						- FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
+								,STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X))).GetSafeNormal()),
 						
 				STConFMenor.CasillaAnterior.HIDuenyo, 
 				false,
@@ -142,26 +144,33 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 			PuenteActual.IndexLocal = STConFMenor.CasillaActual.IndexLocal + 4;
 			PuenteActual.Tipo = STConFMenor.CasillaAnterior.Tipo;
 			PuenteActual.GridPosition = FVector2D(STConFMenor.CasillaActual.GridPosition +
+
 				FVector2D(
-					(FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().Y
-						, STConFMenor.CasillaActual.HIDuenyo->GetOwner()->GetActorLocation().X)
-						,
-						FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().Y
-							, STConFMenor.CasillaAnterior.HIDuenyo->GetOwner()->GetActorLocation().X)).GetSafeNormal()));
-										
+					(
+					FVector2D(STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
+							,STConFMenor.CasillaAnterior.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X)
+					- FVector2D(STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().Y
+							,STConFMenor.CasillaActual.HIDuenyo->GetOwner<AZona>()->GetActorLocation().X))).GetSafeNormal());
+			
+			
 			PuenteActual.HIDuenyo = STConFMenor.CasillaActual.HIDuenyo;
-			PuenteActual.PuenteAsociado = nullptr;
+			
 			//SemiPuente2
-			CaminoFin.Add(PuenteActual, PuenteAnterior);
+			CaminoFin.Add(PuenteActual,PuenteAnterior );
 
 			//Puente2
 			CaminoFin.Add(STConFMenor.CasillaActual, PuenteActual);
+			*/
 
-			STConFMenor.CantidadRecorrida = STConFMenor.CantidadRecorrida + 3;
+			STConFMenor.CantidadRecorrida += 3; 
 		}
 		// Valorar Filtrar por predicado CaminosPosibles.FilterByPredicate()
 
-		for(FMovimientoEnemigo CaminoPosible : CaminosPosibles){
+		CaminosPosibles.RemoveAll([STConFMenor](const FMovimientoEnemigo& CaminoPosible) {
+			return CaminoPosible.CasillaActual.IndexLocal == STConFMenor.CasillaActual.IndexLocal
+				&& CaminoPosible.CasillaActual.HIDuenyo == STConFMenor.CasillaActual.HIDuenyo;
+		});
+		/*for(const FMovimientoEnemigo CaminoPosible : CaminosPosibles){
 			if(
 				CaminoPosible.CasillaActual.IndexLocal == STConFMenor.CasillaActual.IndexLocal
 			&& CaminoPosible.CasillaActual.HIDuenyo == STConFMenor.CasillaActual.HIDuenyo
@@ -169,7 +178,7 @@ TArray<FDatosCasillas> UEnemigoManager::CalcularCaminoASeguir(FVector2D Coordena
 				CaminosPosibles.Remove(CaminoPosible);
 				break;
 			}
-		}
+		}*/
 
 		STConFMenor.CosteMovimiento = TNumericLimits<int>::Max();
 

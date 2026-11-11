@@ -381,7 +381,6 @@ void APersonaje::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 				UEnhancedInputComponent::FEnhancedInputHandlerValueSignature::CreateLambda([this](const FInputActionValue& Value)
 					{
 						Colocar(ETiposColocables::Torreta);
-						UE_LOG(LogTemp, Warning, TEXT("¡C2665 solucionado con Lambda!"));
 					}));
 		
 		}*/
