@@ -60,6 +60,9 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ClaseBala", meta = (AllowPrivateAcces = "true"))
+	TSubclassOf<ABala> ClaseBala;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

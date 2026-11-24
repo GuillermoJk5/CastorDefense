@@ -115,11 +115,13 @@ FVector AEnemigo :: PredecirMovimiento(float TiempoOdjetivo){
 			FVector CoordenadaFinal(
 				CoordenadaMatriz.X + PosicionCasilla.X, 
 				CoordenadaMatriz.Y + PosicionCasilla.Y,
-				200);
+				100.f);
 
 			if (TiempoOdjetivo <= FVector::Dist(PosicionActual, CoordenadaFinal) / GetCharacterMovement()->MaxWalkSpeed) {
-			
-				return FVector(PosicionActual + FVector2D(FVector2D(CoordenadaFinal) - FVector2D(PosicionActual)).Normalize() * GetCharacterMovement()->MaxWalkSpeed * TiempoOdjetivo);
+				const FVector2D Direccion2D = (FVector2D(CoordenadaFinal) - FVector2D(PosicionActual)).GetSafeNormal();
+				const FVector Direccion(Direccion2D, 0.f);
+
+				return FVector(PosicionActual + Direccion * GetCharacterMovement()->MaxWalkSpeed * TiempoOdjetivo);
 			
 			}
 			else {
@@ -174,7 +176,7 @@ void AEnemigo::Destruir()
 	UClaseDeUtilidades::ActivarDesactivarActor(this, false);
 
 	this->SetActorLocation(
-		FVector(0, 0, -10000),
+		FVector(0, 0, -1000),
 		false,
 		nullptr,
 		ETeleportType::TeleportPhysics

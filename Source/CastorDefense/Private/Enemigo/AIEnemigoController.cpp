@@ -41,9 +41,7 @@ void AAIEnemigoController::SetMundoManager(UMundoManager* InMundoManager)
 
 void AAIEnemigoController::Avanzar()
 {
-	AEnemigo* Poseido = Cast<AEnemigo>(GetPawn());
-
-	if (Poseido) {
+	if (AEnemigo* Poseido = Cast<AEnemigo>(GetPawn())) {
 
 		CaminoRuta2 = Poseido->GetRuta();
 		Algo::Reverse(CaminoRuta2);

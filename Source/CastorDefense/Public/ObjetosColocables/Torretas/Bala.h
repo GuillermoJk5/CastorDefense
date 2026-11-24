@@ -31,7 +31,10 @@ public:
 	void SetDanyo(float InDanyo);
 
 	UFUNCTION()
-	void ActivarBala(FVector Posicion,FRotator Rotacion);
+	void ActivarBala(FVector Posicion, FRotator Rotacion, FVector PosicionFinal);
+
+	//UFUNCTION()
+	//void ActivarBala(FVector Posicion,FRotator Rotacion);
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -41,10 +44,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	
+
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

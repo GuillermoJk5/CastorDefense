@@ -62,7 +62,8 @@ void UOleadasManager::JGO(){
 	TArray<FDatosCasillas> PosicionesSpawns;
 	TArray<AZona*> ZonasConSpawns;
 	EncontrarSpawns(PosicionesSpawns, ZonasConSpawns);
-	GenerarEnemigosMientrasHayaSaldo(PosicionesSpawns, ZonasConSpawns);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_GeneradorDeEnemigos, [this, PosicionesSpawns, ZonasConSpawns]() {GenerarEnemigosMientrasHayaSaldo(PosicionesSpawns, ZonasConSpawns); }, 3.f, true);
+	//GenerarEnemigosMientrasHayaSaldo(PosicionesSpawns, ZonasConSpawns);
 }
 
 void UOleadasManager::EncontrarSpawns(TArray<FDatosCasillas>& PosicionesSpawns, TArray<AZona*>& ZonasConSpawns){
@@ -118,16 +119,10 @@ void UOleadasManager::GenerarEnemigosMientrasHayaSaldo(TArray<FDatosCasillas> Po
 			GetWorld()->GetTimerManager().ClearTimer(TimerHandle_GeneradorDeEnemigos);
 			return;
 		}
-		EnemigoManager->ActivarEnemigo(ZonasConSpawns[Index], DatosCasilla);
-		SaldoGeneracionEnemigo -= 1;
+		if(EnemigoManager->ActivarEnemigo(ZonasConSpawns[Index], DatosCasilla))	SaldoGeneracionEnemigo -= 4;
 		Index++;
 	}
 
-	if (SaldoGeneracionEnemigo > 0) {
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_GeneradorDeEnemigos, [this, PosicionesSpawns, ZonasConSpawns]() {GenerarEnemigosMientrasHayaSaldo(PosicionesSpawns, ZonasConSpawns);},3.f,false);
-	}
-	else {
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_GeneradorDeEnemigos);
-	}
+	
 	
 }

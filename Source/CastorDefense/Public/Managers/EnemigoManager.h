@@ -39,7 +39,7 @@ public:
 	void SetEnemigosGestionables(TArray<AEnemigo*> InEnemigosGestionables);
 
 	UFUNCTION(Category = "EventGraph")
-	void ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn);
+	bool ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn);
 
 	UFUNCTION()
 	TArray<FDatosCasillas> CalcularCaminoASeguir(FVector2D CoordenadasObjetivo, AZona* ZonaSpawn, FDatosCasillas DatosCasillaActual);

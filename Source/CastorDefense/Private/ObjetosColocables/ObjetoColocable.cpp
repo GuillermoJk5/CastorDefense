@@ -13,14 +13,14 @@ AObjetoColocable::AObjetoColocable()
 	PrimaryActorTick.bCanEverTick = true;
 
 	this->CasillaValida = ETipoCasilla::Terreno;
+
+	Activada = false;
 }
 
 // Called when the game starts or when spawned
 void AObjetoColocable::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	Activada = false;
 }
 
 // Called every frame
@@ -88,7 +88,7 @@ void AObjetoColocable::CalcularEnergiaYActivar()
 		AActor* BuscoNucleo = UGameplayStatics::GetActorOfClass(GetWorld(), ANucleo::StaticClass());
 		Nucleo = Cast<ANucleo>(BuscoNucleo);
 	}
-	if (Nucleo && Nucleo->ActualizarEnergia(CosteDeEnergia *= -1)) {
+	if (Nucleo && Nucleo->ActualizarEnergia(CosteDeEnergia * -1)) {
 		DesActivar();
 	}
 }

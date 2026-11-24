@@ -10,7 +10,6 @@
 #include "Enemigo/AIEnemigoController.h"
 #include "ClaseDeUtilidades.h"
  
-#include "ClaseDeUtilidades.h"
 #include "TiposDeDatosComunes/Enum/ETipoCasillaMapa.h"
 #include "TiposDeDatosComunes/Struct/FMovimientoEnemigo.h"
 
@@ -57,7 +56,7 @@ void UEnemigoManager::SetEnemigosGestionables(TArray<AEnemigo*> InEnemigosGestio
 	this->EnemigosGestionables = InEnemigosGestionables;
 }
 
-void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
+bool UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 {
 
 	ANucleo* Nucleo = Cast<ANucleo>(UGameplayStatics::GetActorOfClass(GetWorld(), ANucleo::StaticClass()));
@@ -72,9 +71,16 @@ void UEnemigoManager::ActivarEnemigo(AZona* Zona, FDatosCasillas CasillaSpawn)
 			{
 				return Elemento.Tipo == ETipoCasilla::Objetivo;
 			})
-		)
-		PosicionarEnemigo(Ruta, CasillaSpawn, Zona);
+		){
+			PosicionarEnemigo(Ruta, CasillaSpawn, Zona);
+			return true;
+		}
+		else {
+			return false;
+		}
+		
 	}
+	return false;
 
 }
 
@@ -370,7 +376,7 @@ void UEnemigoManager::DesActivarEnemigo(AEnemigo* Enemigo, bool Activar)
 	if (Activar) {
 		Enemigo->GetMesh()->Activate();
 		Enemigo->GetCharacterMovement()->Activate();
-		AAIEnemigoController* AI =Cast<AAIEnemigoController>(Enemigo->GetOwner());
+		AAIEnemigoController* AI =Cast<AAIEnemigoController>(Enemigo->GetController());
 		Enemigo->GetCharacterMovement()->GravityScale = 1.0f;
 		AI->Avanzar();
 	}

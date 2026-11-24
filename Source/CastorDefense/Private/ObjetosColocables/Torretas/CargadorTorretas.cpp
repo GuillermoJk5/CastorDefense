@@ -7,6 +7,7 @@
 #include "ObjetosColocables/Torretas/Bala.h"
 #include "Municion/CajaMunicion.h"
 #include "Personaje/Personaje.h"
+#include "ClaseDeUtilidades.h"
 
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
@@ -113,14 +114,14 @@ void UCargadorTorretas::DispararBala()
 {
 	ATorreta* Torreta = Cast<ATorreta>(GetOwner());
 	float VelocidadProyectil = 1000.f;
-	float TiempoObjetivo = FVector::Dist(Torreta->GetActorLocation(), Torreta->GetObjetivo()->GetActorLocation()) / VelocidadProyectil;
+	float TiempoObjetivo = FVector::Dist(FVector(Torreta->GetActorLocation().X, Torreta->GetActorLocation().Y, Torreta->GetActorLocation().Z + 80.f), Torreta->GetObjetivo()->GetActorLocation()) / VelocidadProyectil;
 
 	const float Tolerancia = 0.05f;
 	FVector PosicionFinal;
 	float Distancia;
 	for (int Index = 0; Index < 20; Index++) {
 		PosicionFinal = Torreta->GetObjetivo()->PredecirMovimiento(TiempoObjetivo);
-		Distancia = FVector::Dist(Torreta->GetActorLocation(), PosicionFinal);
+		Distancia = FVector::Dist(FVector(Torreta->GetActorLocation().X, Torreta->GetActorLocation().Y, Torreta->GetActorLocation().Z + 80.f), PosicionFinal);
 
 		if (FMath::Abs(Distancia / VelocidadProyectil - TiempoObjetivo) < Tolerancia) {
 			break;
@@ -129,9 +130,11 @@ void UCargadorTorretas::DispararBala()
 			TiempoObjetivo = Distancia / VelocidadProyectil;
 		}
 	}
+
 	if (Torreta->GetAreaRango()->GetScaledSphereRadius() > FVector::Dist(Torreta->GetAreaRango()->GetComponentLocation(), PosicionFinal)) {
-		Balas[IndexBalas]->ActivarBala(Torreta->GetActorLocation(), UKismetMathLibrary::FindLookAtRotation(Torreta->GetActorLocation(), PosicionFinal));
+		Balas[IndexBalas]->ActivarBala(FVector(Torreta->GetActorLocation().X, Torreta->GetActorLocation().Y, Torreta->GetActorLocation().Z + 80.f), UKismetMathLibrary::FindLookAtRotation(FVector(Torreta->GetActorLocation().X, Torreta->GetActorLocation().Y, Torreta->GetActorLocation().Z + 80.f), PosicionFinal), PosicionFinal);
 		Municion--;
+		IndexBalas = IndexBalas + 1 >= Balas.Num() ? 0 : IndexBalas + 1;
 	}
 	else {
 		Torreta->ObjetivoSaldraDeArea();
@@ -159,7 +162,21 @@ void UCargadorTorretas::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	for (int i = 0; i < 100; i++) {
+		ABala* Bala = GetWorld()->SpawnActorDeferred<ABala>(
+			ClaseBala,
+			FTransform(FRotator::ZeroRotator, this->GetOwner()->GetActorLocation()),
+			nullptr,
+			nullptr,
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+		);
+		if (Bala) {
+			UClaseDeUtilidades::ActivarDesactivarActor(Bala, false);
+			Bala->SetTorreta(Cast<ATorreta>(this->GetOwner()));
+			Balas.Add(Bala);
+			Bala->FinishSpawning(FTransform(FRotator::ZeroRotator, this->GetOwner()->GetActorLocation()));
+		}
+	}
 	
 }
 

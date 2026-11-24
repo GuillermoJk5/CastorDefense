@@ -23,6 +23,7 @@ ABala::ABala()
 
     ProjectileMovement->InitialSpeed = 1000.0f;
     ProjectileMovement->MaxSpeed = 1000.0f;
+	ProjectileMovement->bInitialVelocityInLocalSpace = false;
     ProjectileMovement->bRotationFollowsVelocity = false;
 }
 
@@ -46,13 +47,18 @@ void ABala::SetDanyo(float InDanyo)
 	this->Danyo = InDanyo;
 }
 
-void ABala::ActivarBala(FVector Posicion, FRotator Rotacion)
+void ABala::ActivarBala(FVector Posicion, FRotator Rotacion, FVector PosicionFinal)
 {
-	this->SetActorLocationAndRotation(Posicion,Rotacion,false,nullptr,ETeleportType ::TeleportPhysics );
+	this->SetActorLocationAndRotation(Posicion,Rotacion, false, nullptr, ETeleportType::TeleportPhysics);
 	
 	UClaseDeUtilidades::ActivarDesactivarActor(this, true);
 
-	ProjectileMovement->Velocity = FVector(ProjectileMovement->MaxSpeed, 0.f, 0.f);
+	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->MaxSpeed;
+
+	//Ver Prediccion en el mapa
+	DrawDebugSphere(GetWorld(), PosicionFinal, 30.f, 12, FColor::Red, false, 2.f);
+	DrawDebugLine(GetWorld(), Posicion, Posicion + ProjectileMovement->Velocity.GetSafeNormal() * 1000.f, FColor::Green, false, 2.f);
+
 	ProjectileMovement->Activate();
 
 	

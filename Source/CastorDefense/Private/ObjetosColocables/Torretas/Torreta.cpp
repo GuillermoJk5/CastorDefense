@@ -5,10 +5,12 @@
 #include "Enemigo/Enemigo.h"
 #include "TimerManager.h"
 #include "ObjetosColocables/Torretas/CargadorTorretas.h"
+#include "Mapa/Nucleo.h"
 
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include <Kismet/GameplayStatics.h>
 
 ATorreta::ATorreta()
 {
@@ -21,6 +23,8 @@ ATorreta::ATorreta()
 
 	AreaDeteccion->SetupAttachment(OrientacionArrow);
 	AreaRango->SetupAttachment(OrientacionArrow);
+
+	this->CosteDeEnergia = 100;
 }
 
 AEnemigo* ATorreta::GetObjetivo()
@@ -89,20 +93,20 @@ void ATorreta::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	if (this->Activada) {
 
-		if (Cast<AEnemigo>(OtherActor)) {
-			AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor);
+		if (AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor)) {
 			EnRango.Add(Enemigo);
 			if (!Objetivo) {
 				Objetivo = Enemigo;
+				GetWorldTimerManager().SetTimer(
+					TiempoProximoDisparo,
+					this,
+					&ATorreta::Disparar, //Valorar LLamar al metodo de disparo de el component directamente
+					1.f,
+					true
+				);
 			}
 
-			GetWorldTimerManager().SetTimer(
-				TiempoProximoDisparo,
-				this,
-				&ATorreta::Disparar, //Valorar LLamar al metodo de disparo de el component directamente
-				1.f,
-				true
-			);
+			
 		}
 	}
 }
@@ -110,10 +114,9 @@ void ATorreta::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 void ATorreta::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (this->Activada) {
-		if (Cast<AEnemigo>(OtherActor)) {
-			AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor);
+		if (AEnemigo* Enemigo = Cast<AEnemigo>(OtherActor)) {
 			EnRango.Remove(Enemigo);
-			if (EnRango[0]) {
+			if (!EnRango.IsEmpty()) {
 				Objetivo = EnRango[0];
 			}
 			else {
@@ -132,7 +135,7 @@ void ATorreta::Tick(float DeltaTime)
 	
 	if (!Objetivo) return;
 
-	SetActorRotation(FRotator(0.f, 0.f, UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Objetivo->GetActorLocation()).Yaw));
+	SetActorRotation(FRotator(0.f, UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Objetivo->GetActorLocation()).Yaw, 0.f));
 	
 }
 
@@ -140,7 +143,7 @@ void ATorreta::ObjetivoSaldraDeArea()
 {
 	EnRango.Remove(Objetivo);
 
-	if (EnRango[0]) {
+	if (!EnRango.IsEmpty()) {
 		Objetivo = EnRango[0];
 		Disparar();
 	}
@@ -170,6 +173,5 @@ void ATorreta::BeginPlay()
 	AreaDeteccion->OnComponentBeginOverlap.AddDynamic(this, &ATorreta::OnOverlapBegin);
 	AreaDeteccion->OnComponentEndOverlap.AddDynamic(this, &ATorreta::OnOverlapEnd);
 
-	this->CosteDeEnergia = 100;
 }
 
