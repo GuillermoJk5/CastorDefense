@@ -7,6 +7,7 @@
 #include "Municion/CajaMunicion.h"
 #include "Nucleo.generated.h"
 
+class AHUDController;
 
 UCLASS()
 class CASTORDEFENSE_API ANucleo : public AActor
@@ -80,5 +81,9 @@ private:
 
 	UPROPERTY()
 	TArray<ACajaMunicion*> MunicionCreada;
+
+	UPROPERTY()
+	AHUDController* HUDController;
+	
 
 };

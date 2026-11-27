@@ -6,6 +6,8 @@
 #include "ClaseDeUtilidades.h"
 
 #include "Components/StaticMeshComponent.h"
+#include <Kismet/GameplayStatics.h>
+#include <Personaje/Personaje.h>
 
 // Sets default values
 ANucleo::ANucleo()
@@ -71,6 +73,17 @@ void ANucleo::BeginPlay()
 
 	
 	this->SetEnergiaRestante(this->EnergiaMax);
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	
+	if (HUDController = Cast<AHUDController>(PlayerController->GetHUD()),HUDController) {
+		
+		HUDController->ActualizarEnergia(EnergiaMax, EnergiaMax);
+	}
+	
+	
+	
+	
 	
 }
 
@@ -106,6 +119,8 @@ void ANucleo::PerderVida(float Danyo){
 bool ANucleo::ActualizarEnergia(float CosteDeEnergia)
 {
 	EnergiaRestante = (EnergiaRestante + CosteDeEnergia) > EnergiaMax ? EnergiaMax : (EnergiaRestante + CosteDeEnergia);
+	
+	HUDController->ActualizarEnergia(EnergiaRestante, EnergiaMax);
 
 	return EnergiaRestante >= 0;
 }

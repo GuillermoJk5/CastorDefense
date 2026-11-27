@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+#include "Managers/HUDController.h"
 #include "TiposDeDatosComunes/Enum/TiposColocables.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
